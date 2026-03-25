@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { generateTestFile } from '../generator.js';
+import { generateTestFile } from '../generators/playwright.js';
 import type { Screen, Setup } from '../schema.js';
 
 const setups: Setup[] = [

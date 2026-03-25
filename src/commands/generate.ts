@@ -3,7 +3,7 @@ import path from 'node:path';
 
 import { Command, Flags } from '@oclif/core';
 
-import { generateTestFile } from '../core/generator.js';
+import { AVAILABLE_TARGETS, getGenerator, isTarget } from '../core/generators/registry.js';
 import { parseProject } from '../core/parser.js';
 import { validate } from '../core/validator.js';
 import { printError, printSuccess, printWarning } from '../utils/output.js';
@@ -11,7 +11,7 @@ import { printError, printSuccess, printWarning } from '../utils/output.js';
 const DEFAULT_OUTPUT_DIR = './tests';
 
 export default class Generate extends Command {
-  static summary = 'Generate Playwright skeletons from tespec YAML';
+  static summary = 'Generate test skeletons from tespec YAML';
 
   static flags = {
     config: Flags.string({
@@ -30,12 +30,25 @@ export default class Generate extends Command {
       description: 'Directory to write generated spec files',
       default: DEFAULT_OUTPUT_DIR,
     }),
+    target: Flags.string({
+      char: 't',
+      description: 'Target test framework',
+      options: [...AVAILABLE_TARGETS],
+      default: 'playwright',
+    }),
   };
 
   async run(): Promise<void> {
     const { flags } = await this.parse(Generate);
     const configPath = resolveConfigPath(flags.config);
     const outputDir = resolveOutputDir(flags['out-dir']);
+
+    if (!isTarget(flags.target)) {
+      printError('target', `Unknown target: ${flags.target}`);
+      this.exit(1);
+    }
+    const generator = getGenerator(flags.target);
+
     const parsed = await parseProject(configPath);
 
     if (parsed.errors.length > 0 || !parsed.result) {
@@ -74,12 +87,14 @@ export default class Generate extends Command {
 
     const outputs = selectedScreens.map((screen) => ({
       screenId: screen.screen,
-      content: generateTestFile(screen, setups),
+      content: generator.generate(screen, setups),
     }));
 
     if (flags['dry-run']) {
       for (const output of outputs) {
-        this.log(`// ${toDisplayPath(path.join(outputDir, `${output.screenId}.spec.ts`))}`);
+        this.log(
+          `// ${toDisplayPath(path.join(outputDir, generator.fileNameFor(output.screenId)))}`,
+        );
         this.log(output.content.trimEnd());
       }
     } else {
@@ -87,7 +102,11 @@ export default class Generate extends Command {
 
       await Promise.all(
         outputs.map((output) =>
-          writeFile(path.join(outputDir, `${output.screenId}.spec.ts`), output.content, 'utf8'),
+          writeFile(
+            path.join(outputDir, generator.fileNameFor(output.screenId)),
+            output.content,
+            'utf8',
+          ),
         ),
       );
     }
