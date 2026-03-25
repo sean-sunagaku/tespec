@@ -3,6 +3,7 @@ import { z } from 'zod';
 export const CaseSchema = z.object({
   action: z.string(),
   expect: z.union([z.string(), z.array(z.string())]),
+  steps: z.array(z.string()).min(1),
   given: z.union([z.string(), z.array(z.string())]).optional(),
   target: z.string().optional(),
   type: z.enum(['normal', 'error', 'boundary']).default('normal'),

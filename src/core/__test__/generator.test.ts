@@ -19,6 +19,7 @@ describe('generateTestFile', () => {
         {
           action: '画面を開く',
           expect: 'フォームが表示される',
+          steps: ['/login にアクセスする'],
           type: 'normal',
         },
       ],
@@ -26,9 +27,11 @@ describe('generateTestFile', () => {
 
     expect(generateTestFile(screen, setups)).toMatchInlineSnapshot(`
       "import { test, expect } from "@playwright/test";
-      
+
       test.describe("ログイン画面", () => {
         test("画面を開く → フォームが表示される", async () => {
+          // Steps:
+          //   1. /login にアクセスする
           // TODO: implement
         });
       });
@@ -45,12 +48,14 @@ describe('generateTestFile', () => {
         {
           action: '画面を開く',
           expect: ['一覧が表示される', 'ユーザー名が表示される'],
+          steps: ['use:logged_in', 'use:seeded', '/ にアクセスする'],
           given: ['logged_in', 'seeded'],
           type: 'normal',
         },
         {
           action: '画面を開く',
           expect: 'エラーが表示される',
+          steps: ['use:offline', '/ にアクセスする'],
           given: 'offline',
           not_expect: ['空の一覧が表示される'],
           type: 'error',
@@ -58,6 +63,7 @@ describe('generateTestFile', () => {
         {
           action: '画面を開く',
           expect: '空状態が表示される',
+          steps: ['use:seeded', '/ にアクセスする'],
           given: 'seeded',
           type: 'boundary',
         },
@@ -66,15 +72,25 @@ describe('generateTestFile', () => {
 
     expect(generateTestFile(screen, setups)).toMatchInlineSnapshot(`
       "import { test, expect } from "@playwright/test";
-      
+
       test.describe("ホーム画面", () => {
         test("画面を開く → 一覧が表示される", async () => {
           // Given: ログイン済み状態, プロジェクト3件のシードデータ
+          // Steps:
+          //   1. [use:logged_in] ログイン済み状態
+
+          //   2. [use:seeded] プロジェクト3件のシードデータ
+
+          //   3. / にアクセスする
           // TODO: implement
         });
         test.describe("異常系", () => {
           test("[offline] 画面を開く → エラーが表示される", async () => {
             // Given: オフライン状態
+            // Steps:
+            //   1. [use:offline] オフライン状態
+
+            //   2. / にアクセスする
             // not_expect: 空の一覧が表示される
             // TODO: implement
           });
@@ -82,6 +98,10 @@ describe('generateTestFile', () => {
         test.describe("境界値", () => {
           test("[seeded] 画面を開く → 空状態が表示される", async () => {
             // Given: プロジェクト3件のシードデータ
+            // Steps:
+            //   1. [use:seeded] プロジェクト3件のシードデータ
+
+            //   2. / にアクセスする
             // TODO: implement
           });
         });
@@ -99,6 +119,7 @@ describe('generateTestFile', () => {
         {
           action: '画面を開く',
           expect: '詳細が表示される',
+          steps: ['/detail にアクセスする'],
           given: 'temporary_state',
           type: 'boundary',
         },

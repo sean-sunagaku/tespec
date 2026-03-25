@@ -16,6 +16,7 @@ describe('schema', () => {
     const result = CaseSchema.parse({
       action: 'open screen',
       expect: 'home is visible',
+      steps: ['open /'],
     });
 
     expect(result.type).toBe('normal');
@@ -26,11 +27,13 @@ describe('schema', () => {
       action: 'submit',
       given: 'logged in',
       expect: 'success',
+      steps: ['click submit'],
     });
     const arrayCase = CaseSchema.parse({
       action: 'submit',
       given: ['logged in', 'projects seeded'],
       expect: ['success', 'toast shown'],
+      steps: ['use:logged_in', 'click submit'],
     });
 
     expect(stringCase.given).toBe('logged in');
@@ -39,10 +42,30 @@ describe('schema', () => {
     expect(arrayCase.expect).toEqual(['success', 'toast shown']);
   });
 
+  it('rejects missing steps', () => {
+    const result = CaseSchema.safeParse({
+      action: 'submit',
+      expect: 'success',
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects empty steps array', () => {
+    const result = CaseSchema.safeParse({
+      action: 'submit',
+      expect: 'success',
+      steps: [],
+    });
+
+    expect(result.success).toBe(false);
+  });
+
   it('rejects invalid type values', () => {
     const result = CaseSchema.safeParse({
       action: 'submit',
       expect: 'success',
+      steps: ['click submit'],
       type: 'invalid',
     });
 
@@ -58,6 +81,7 @@ describe('schema', () => {
         {
           action: 'open',
           expect: 'form visible',
+          steps: ['open /login'],
         },
       ],
     });

@@ -16,16 +16,19 @@ function createCompleteCases(): Screen['cases'] {
     {
       action: '画面を開く',
       expect: '一覧が表示される',
+      steps: ['/ にアクセスする'],
       type: 'normal',
     },
     {
       action: '不正入力を送信する',
       expect: 'エラーが表示される',
+      steps: ['/ にアクセスする', '不正な値を入力する'],
       type: 'error',
     },
     {
       action: '大量データで開く',
       expect: 'ページネーションが表示される',
+      steps: ['/ にアクセスする'],
       type: 'boundary',
     },
   ];
@@ -53,17 +56,20 @@ describe('validate', () => {
           {
             action: '画面を開く',
             expect: 'フォームが表示される',
+            steps: ['/login にアクセスする'],
             type: 'normal',
             navigates_to: 'home',
           },
           {
             action: '誤った資格情報を送信する',
             expect: 'エラーが表示される',
+            steps: ['/login にアクセスする', '誤った認証情報を入力する'],
             type: 'error',
           },
           {
             action: '長いメールアドレスを入力する',
             expect: 'バリデーションが表示される',
+            steps: ['/login にアクセスする', '256文字を入力する'],
             type: 'boundary',
           },
         ],
@@ -110,18 +116,21 @@ describe('validate', () => {
             {
               action: '画面を開く',
               expect: '一覧が表示される',
+              steps: ['/ にアクセスする'],
               type: 'normal',
               given: 'missing_setup',
             },
             {
               action: '復帰する',
               expect: 'エラーが表示される',
+              steps: ['/ にアクセスする'],
               type: 'error',
               given: ['logged_in', 'missing_seed'],
             },
             {
               action: '100件で開く',
               expect: 'ページネーションが表示される',
+              steps: ['/ にアクセスする'],
               type: 'boundary',
               given: 'logged_in',
             },
@@ -156,18 +165,21 @@ describe('validate', () => {
             {
               action: 'リンクを押す',
               expect: '詳細に遷移する',
+              steps: ['リンクをクリックする'],
               type: 'normal',
               navigates_to: 'missing_screen',
             },
             {
               action: 'エラーリンクを押す',
               expect: 'ログインに戻る',
+              steps: ['エラーリンクをクリックする'],
               type: 'error',
               navigates_to: 'login',
             },
             {
               action: '件数境界で開く',
               expect: '一覧が表示される',
+              steps: ['/ にアクセスする'],
               type: 'boundary',
             },
           ],
@@ -230,11 +242,13 @@ describe('validate', () => {
             {
               action: '画面を開く',
               expect: '一覧が表示される',
+              steps: ['/ にアクセスする'],
               type: 'normal',
             },
             {
               action: '100件で開く',
               expect: 'ページネーションが表示される',
+              steps: ['/ にアクセスする'],
               type: 'boundary',
             },
           ],
@@ -262,11 +276,13 @@ describe('validate', () => {
             {
               action: '画面を開く',
               expect: '一覧が表示される',
+              steps: ['/ にアクセスする'],
               type: 'normal',
             },
             {
               action: '不正入力を送信する',
               expect: 'エラーが表示される',
+              steps: ['/ にアクセスする', '不正な値を入力する'],
               type: 'error',
             },
           ],
@@ -295,6 +311,7 @@ describe('validate', () => {
             {
               action: '画面を開く',
               expect: '一覧が表示される',
+              steps: ['use:missing_setup', '/ にアクセスする'],
               type: 'normal',
               given: 'missing_setup',
               navigates_to: 'missing_screen',
@@ -309,6 +326,7 @@ describe('validate', () => {
             {
               action: '画面を開く',
               expect: '一覧が表示される',
+              steps: ['/ にアクセスする'],
               type: 'normal',
             },
           ],

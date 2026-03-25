@@ -14,6 +14,18 @@ function configPath(name: string): string {
   return resolve(fixturesRoot, name, 'config.yaml');
 }
 
+function expectStepsInOrder(output: string, steps: string[]): void {
+  for (const step of steps) {
+    expect(output).toContain(step);
+  }
+  let lastIndex = -1;
+  for (const step of steps) {
+    const index = output.indexOf(step);
+    expect(index).toBeGreaterThan(lastIndex);
+    lastIndex = index;
+  }
+}
+
 describe.sequential('generate command', () => {
   it('prints Playwright skeletons on dry-run', async () => {
     const result = await runCommand(Generate, [
@@ -27,6 +39,11 @@ describe.sequential('generate command', () => {
     expect(result.code).toBe(0);
     expect(result.stdout).toContain('// tests/generated/home.spec.ts');
     expect(result.stdout).toContain('test.describe("ホーム画面"');
+    expectStepsInOrder(result.stdout, [
+      '[use:logged_in] ログイン済み状態',
+      '[use:seed_projects] プロジェクト3件のシードデータ',
+      '/ にアクセスする',
+    ]);
     expect(result.stdout).toContain('files generated');
   });
 
@@ -60,6 +77,11 @@ describe.sequential('generate command', () => {
     expect(result.stdout).toContain('// tests/generated/login.spec.ts');
     expect(result.stdout).not.toContain('// tests/generated/home.spec.ts');
     expect(result.stdout).toContain('test.describe("ログイン画面"');
+    expectStepsInOrder(result.stdout, [
+      '/login にアクセスする',
+      '誤った認証情報を入力する',
+      '送信ボタンをクリックする',
+    ]);
   });
 
   it('writes generated files to a custom output directory', async () => {
@@ -78,6 +100,12 @@ describe.sequential('generate command', () => {
     const loginSpec = await readFile(resolve(outputDir, 'login.spec.ts'), 'utf8');
 
     expect(homeSpec).toContain('test.describe("ホーム画面"');
+    expectStepsInOrder(homeSpec, [
+      '[use:logged_in] ログイン済み状態',
+      '[use:seed_projects] プロジェクト3件のシードデータ',
+      '/ にアクセスする',
+    ]);
     expect(loginSpec).toContain('test.describe("ログイン画面"');
+    expectStepsInOrder(loginSpec, ['/login にアクセスする']);
   });
 });

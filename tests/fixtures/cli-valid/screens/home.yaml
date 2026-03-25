@@ -4,14 +4,24 @@ title: ホーム画面
 cases:
   - action: 画面を開く
     given: logged_in
+    steps:
+      - "use:logged_in"
+      - / にアクセスする
     expect: 一覧が表示される
   - action: オフラインで開く
     given: offline
+    steps:
+      - "use:offline"
+      - / にアクセスする
     expect: エラーメッセージが表示される
     type: error
   - action: 100件で開く
     given:
       - logged_in
       - seed_projects
+    steps:
+      - "use:logged_in"
+      - "use:seed_projects"
+      - / にアクセスする
     expect: ページネーションが表示される
     type: boundary

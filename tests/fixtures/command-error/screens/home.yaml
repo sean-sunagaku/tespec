@@ -3,12 +3,20 @@ route: "/"
 title: "ホーム画面"
 cases:
   - action: "画面を開く"
+    steps:
+      - "use:missing_setup"
+      - "/ にアクセスする"
     expect: "一覧が表示される"
     given: "missing_setup"
     navigates_to: "missing_screen"
   - type: error
     action: "保存する"
+    steps:
+      - "/ にアクセスする"
+      - "保存ボタンをクリックする"
     expect: "エラーが表示される"
   - type: boundary
     action: "100件で開く"
+    steps:
+      - "/ にアクセスする"
     expect: "ページネーションが表示される"

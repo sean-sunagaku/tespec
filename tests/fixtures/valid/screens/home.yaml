@@ -4,13 +4,22 @@ title: ホーム画面
 cases:
   - action: 画面を開く
     given: logged_in
+    steps:
+      - "use:logged_in"
+      - / にアクセスする
     expect: 一覧が表示される
     type: normal
   - action: 画面を開く
     given: offline
+    steps:
+      - "use:offline"
+      - / にアクセスする
     expect: エラーが表示される
     type: error
   - action: 画面を開く
     given: no_projects
+    steps:
+      - "use:no_projects"
+      - / にアクセスする
     expect: 空状態が表示される
     type: boundary

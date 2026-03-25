@@ -3,4 +3,6 @@ route: "/login"
 title: "ログイン画面"
 cases:
   - action: "画面を開く"
+    steps:
+      - "/login にアクセスする"
     expect: "フォームが表示される"

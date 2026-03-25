@@ -89,6 +89,22 @@ function buildComments(
     comments.push(`${indent}// Given: ${resolved.join(', ')}`);
   }
 
+  if (testCase.steps.length > 0) {
+    comments.push(`${indent}// Steps:`);
+    for (const [i, step] of testCase.steps.entries()) {
+      const ref = step.match(/^use:(.+)$/);
+      if (ref) {
+        const title = setupTitles.get(ref[1]) ?? ref[1];
+        comments.push(`${indent}//   ${i + 1}. [use:${ref[1]}] ${title}`);
+      } else {
+        comments.push(`${indent}//   ${i + 1}. ${step}`);
+      }
+      if (i < testCase.steps.length - 1) {
+        comments.push('');
+      }
+    }
+  }
+
   if (Array.isArray(testCase.not_expect)) {
     for (const entry of testCase.not_expect) {
       comments.push(`${indent}// not_expect: ${entry}`);
