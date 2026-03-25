@@ -7,13 +7,13 @@
 グローバルに使う場合:
 
 ```bash
-npm install -g tespec
+npm install -g @sean-sunagaku/tespec
 ```
 
 単発で使う場合:
 
 ```bash
-npx tespec validate -c docs/tespec/config.yaml
+npx @sean-sunagaku/tespec validate -c docs/tespec/config.yaml
 ```
 
 ## 使い方
