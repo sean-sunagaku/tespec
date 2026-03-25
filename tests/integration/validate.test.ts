@@ -12,6 +12,10 @@ function configPath(name: string): string {
   return resolve(fixturesRoot, name, 'config.yaml');
 }
 
+function fixturePath(...segments: string[]): string {
+  return resolve(fixturesRoot, ...segments);
+}
+
 describe.sequential('validate command', () => {
   it('returns exit 0 and prints OK lines for a valid project', async () => {
     const result = await runCommand(Validate, ['--config', configPath('command-ok')]);
@@ -38,5 +42,50 @@ describe.sequential('validate command', () => {
     expect(result.code).toBe(0);
     expect(result.stderr).toContain('WARN:');
     expect(result.stderr).toContain('異常系 (type: error) が 0 件');
+  });
+
+  it('returns exit 0 for a valid screen YAML via --file', async () => {
+    const filePath = fixturePath('command-ok', 'screens', 'login.yaml');
+    const result = await runCommand(Validate, ['--file', filePath]);
+
+    expect(result.code).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(result.stdout).toContain('OK:');
+    expect(result.stdout).toContain('tests/fixtures/command-ok/screens/login.yaml');
+  });
+
+  it('returns exit 0 for a valid setup YAML via --file', async () => {
+    const filePath = fixturePath('command-ok', 'setups', 'auth.yaml');
+    const result = await runCommand(Validate, ['--file', filePath]);
+
+    expect(result.code).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(result.stdout).toContain('OK:');
+    expect(result.stdout).toContain('tests/fixtures/command-ok/setups/auth.yaml');
+  });
+
+  it('returns exit 1 for an invalid YAML via --file', async () => {
+    const filePath = fixturePath('invalid-schema', 'screens', 'missing-route.yaml');
+    const result = await runCommand(Validate, ['--file', filePath]);
+
+    expect(result.code).toBe(1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toContain('ERROR:');
+    expect(result.stderr).toContain('tests/fixtures/invalid-schema/screens/missing-route.yaml');
+    expect(result.stderr).toContain('route:');
+  });
+
+  it('returns exit 1 when --file and --config are passed together', async () => {
+    const result = await runCommand(Validate, [
+      '--config',
+      configPath('command-ok'),
+      '--file',
+      fixturePath('command-ok', 'screens', 'login.yaml'),
+    ]);
+
+    expect(result.code).toBe(1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toContain('ERROR:');
+    expect(result.stderr).toContain('--file と --config は同時に指定できません');
   });
 });

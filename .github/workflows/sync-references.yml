@@ -1,0 +1,58 @@
+name: Sync Skill References
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - src/core/schema.ts
+      - package.json
+      - scripts/generate-references.ts
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm skill:sync
+
+      - name: Check for generated diff
+        id: diff
+        run: |
+          if git diff --quiet -- skills/tespec-yaml-gen/; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and create PR
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          branch="chore/sync-skill-references-${{ github.run_id }}"
+          git checkout -b "$branch"
+          git add skills/tespec-yaml-gen/
+          git commit -m "chore: sync skill references"
+          git push origin HEAD
+          gh pr create \
+            --title "chore: sync skill references" \
+            --body "schema.ts / package.json の変更を skills/tespec-yaml-gen/ に自動反映しました。" \
+            --base main

@@ -23,7 +23,7 @@ export interface ParseError {
   message: string;
 }
 
-interface ParsedFileResult<T> {
+export interface ParsedFileResult<T> {
   data?: T;
   errors: ParseError[];
 }
@@ -110,7 +110,7 @@ async function parseYamlDirectory<T>(
   return { items, errors };
 }
 
-async function parseYamlFile<T>(
+export async function parseYamlFile<T>(
   filePath: string,
   schema: ZodType<T>,
 ): Promise<ParsedFileResult<T>> {
