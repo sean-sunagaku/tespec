@@ -26,6 +26,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
+    "skill:sync": "tsx scripts/generate-references.ts",
     "lint": "biome lint ./src ./tests",
     "fmt": "biome format --write ./src ./tests",
     "check": "biome check --write ./src ./tests",
@@ -68,6 +69,7 @@
     "@biomejs/biome": "^2.4.8",
     "@types/node": "^25.5.0",
     "tsup": "^8.5.1",
+    "tsx": "^4.21.0",
     "typescript": "^6.0.2",
     "vitest": "^4.1.1"
   },

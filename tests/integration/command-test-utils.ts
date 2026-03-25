@@ -18,7 +18,13 @@ export async function runCommand(
     stdout.push(args.map(String).join(' '));
   });
   const errorSpy = vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {
-    stderr.push(args.map(String).join(' '));
+    const message = args.map(String).join(' ');
+
+    if (isIgnorableOclifWarning(message)) {
+      return;
+    }
+
+    stderr.push(message);
   });
   const catchSpy = vi
     .spyOn(Command.prototype as unknown as { catch: (error: unknown) => Promise<never> }, 'catch')
@@ -52,4 +58,11 @@ export async function runCommand(
     errorSpy.mockRestore();
     logSpy.mockRestore();
   }
+}
+
+function isIgnorableOclifWarning(message: string): boolean {
+  return (
+    message.includes('Could not find source for') &&
+    message.includes('Defaulting to compiled source')
+  );
 }

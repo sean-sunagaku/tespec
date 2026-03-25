@@ -1,0 +1,34 @@
+{
+  "sessionId": "tespec-ai-skill-infra",
+  "topic": "tespec の AI 向け Skill 配布・バリデーション・自動更新基盤のアーキテクチャ設計",
+  "status": "in_progress",
+  "mode": "standard",
+  "currentStep": 1,
+  "createdAt": "2026-03-25T00:00:00Z",
+  "updatedAt": "2026-03-25T00:00:00Z",
+  "techStack": {
+    "language": "TypeScript",
+    "runtime": "Node.js >= 18",
+    "cli": "oclif",
+    "schema": "Zod v4",
+    "yaml": "yaml v2",
+    "bundler": "tsup",
+    "test": "vitest",
+    "linter": "Biome"
+  },
+  "designPolicy": {
+    "coreValue": "YAML 自動生成 + バリデーション・修正提案の両方を同等に",
+    "distribution": "Vercel 的な npx スキルインストーラー方式",
+    "philosophy": "シンプル最優先 - 最小構成でまず動くもの",
+    "autoUpdate": "スキーマ変更時にテスト + リファレンス両方を自動再生成",
+    "audience": "AI エージェント (Claude Code) + 開発者"
+  },
+  "steps": {
+    "1_context": false,
+    "2_pattern": false,
+    "3_modules": false,
+    "4_output": false
+  },
+  "selectedPattern": null,
+  "modules": []
+}
