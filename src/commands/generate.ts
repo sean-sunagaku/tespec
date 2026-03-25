@@ -62,9 +62,10 @@ export default class Generate extends Command {
       this.exit(1);
     }
 
+    const { screens, setups } = parsed.result;
     const selectedScreens = flags.screen
-      ? parsed.result.screens.filter((screen) => screen.screen === flags.screen)
-      : parsed.result.screens;
+      ? screens.filter((screen) => screen.screen === flags.screen)
+      : screens;
 
     if (flags.screen && selectedScreens.length === 0) {
       printError('screen', `screen "${flags.screen}" が見つかりません`);
@@ -73,7 +74,7 @@ export default class Generate extends Command {
 
     const outputs = selectedScreens.map((screen) => ({
       screenId: screen.screen,
-      content: generateTestFile(screen, parsed.result!.setups),
+      content: generateTestFile(screen, setups),
     }));
 
     if (flags['dry-run']) {

@@ -127,6 +127,8 @@ describe('generateTestFile', () => {
     };
 
     expect(generateTestFile(screen, setups)).toContain('// Given: temporary_state');
-    expect(generateTestFile(screen, setups)).toContain('[temporary_state] 画面を開く → 詳細が表示される');
+    expect(generateTestFile(screen, setups)).toContain(
+      '[temporary_state] 画面を開く → 詳細が表示される',
+    );
   });
 });

@@ -38,19 +38,11 @@ function renderNestedGroup(
   ];
 }
 
-function renderCaseGroup(
-  cases: Case[],
-  setupTitles: Map<string, string>,
-  depth: number,
-): string[] {
+function renderCaseGroup(cases: Case[], setupTitles: Map<string, string>, depth: number): string[] {
   return cases.flatMap((testCase) => renderCase(testCase, setupTitles, depth));
 }
 
-function renderCase(
-  testCase: Case,
-  setupTitles: Map<string, string>,
-  depth: number,
-): string[] {
+function renderCase(testCase: Case, setupTitles: Map<string, string>, depth: number): string[] {
   const indent = indentOf(depth);
   const innerIndent = indentOf(depth + 1);
   const comments = buildComments(testCase, setupTitles, depth + 1);
@@ -75,11 +67,7 @@ function buildTestName(testCase: Case): string {
   return `[${givenValues.join(', ')}] ${title}`;
 }
 
-function buildComments(
-  testCase: Case,
-  setupTitles: Map<string, string>,
-  depth: number,
-): string[] {
+function buildComments(testCase: Case, setupTitles: Map<string, string>, depth: number): string[] {
   const indent = indentOf(depth);
   const comments: string[] = [];
 

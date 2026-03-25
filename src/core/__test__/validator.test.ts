@@ -203,9 +203,9 @@ describe('validate', () => {
         }),
       ]),
     );
-    expect(
-      result.issues.filter((issue) => issue.field === 'cases[2].navigates_to'),
-    ).toHaveLength(0);
+    expect(result.issues.filter((issue) => issue.field === 'cases[2].navigates_to')).toHaveLength(
+      0,
+    );
   });
 
   it('reports empty cases as a warning', () => {
