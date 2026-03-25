@@ -5,7 +5,10 @@ import { describe, expect, it } from 'vitest';
 
 import { parseProject } from '../parser.js';
 
-const fixturesRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../tests/fixtures');
+const fixturesRoot = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '../../../tests/fixtures',
+);
 
 function fixtureConfigPath(name: string): string {
   return path.join(fixturesRoot, name, 'config.yaml');

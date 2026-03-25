@@ -26,9 +26,12 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "publish:check": "npm pack --dry-run",
-    "publish:package": "npm publish",
-    "prepublishOnly": "npm test && npm run build",
+    "lint": "biome lint ./src ./tests",
+    "fmt": "biome format --write ./src ./tests",
+    "check": "biome check --write ./src ./tests",
+    "publish:check": "pnpm pack --dry-run",
+    "publish:package": "pnpm publish",
+    "prepublishOnly": "pnpm test && pnpm run build",
     "test": "vitest run"
   },
   "engines": {
@@ -60,6 +63,7 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.4.8",
     "@types/node": "^25.5.0",
     "tsup": "^8.5.1",
     "typescript": "^6.0.2",

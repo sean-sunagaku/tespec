@@ -25,11 +25,9 @@ export async function runCommand(
     .mockImplementation(async (error: unknown) => {
       throw error;
     });
-  const exitSpy = vi
-    .spyOn(Command.prototype, 'exit')
-    .mockImplementation(((code?: number) => {
-      throw new ExitSignal(code ?? 0);
-    }) as typeof Command.prototype.exit);
+  const exitSpy = vi.spyOn(Command.prototype, 'exit').mockImplementation(((code?: number) => {
+    throw new ExitSignal(code ?? 0);
+  }) as typeof Command.prototype.exit);
 
   try {
     await CommandClass.run(argv, { root: process.cwd() });

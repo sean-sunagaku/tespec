@@ -111,7 +111,10 @@ async function parseYamlDirectory<T>(
   return { items, errors };
 }
 
-async function parseYamlFile<T>(filePath: string, schema: ZodType<T>): Promise<ParsedFileResult<T>> {
+async function parseYamlFile<T>(
+  filePath: string,
+  schema: ZodType<T>,
+): Promise<ParsedFileResult<T>> {
   let source: string;
 
   try {

@@ -4,3 +4,4 @@ dist/
 .DS_Store
 .status.json
 tests/generated/*.spec.ts
+package-lock.json
