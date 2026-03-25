@@ -1,0 +1,32 @@
+{
+  "sessionId": "multi-target-generator",
+  "topic": "tespec generate コマンドの複数テストフレームワーク対応アーキテクチャ",
+  "status": "in_progress",
+  "mode": "standard",
+  "currentStep": 1,
+  "createdAt": "2026-03-25T00:00:00+09:00",
+  "updatedAt": "2026-03-25T00:00:00+09:00",
+  "techStack": {
+    "language": "TypeScript",
+    "runtime": "Node.js 18+",
+    "framework": "oclif (CLI)",
+    "buildTool": "tsup (ESM)",
+    "testFramework": "vitest",
+    "schemaValidation": "zod"
+  },
+  "designPolicy": {
+    "philosophy": "拡張性重視 — registry/plugin パターンで新フレームワーク追加時にコア変更不要",
+    "currentTargets": ["playwright", "xcuitest"],
+    "futureTargets": "Cypress, Jest, Swift Testing, Kotlin (Espresso) など",
+    "teamSize": "1人（個人開発）",
+    "keyRequirement": "他の言語・フレームワークでも簡単に拡張・追加できる設計"
+  },
+  "steps": {
+    "1_context": false,
+    "2_pattern": false,
+    "3_modules": false,
+    "4_output": false
+  },
+  "selectedPattern": null,
+  "modules": []
+}
