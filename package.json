@@ -35,6 +35,7 @@
     "prepublishOnly": "pnpm test && pnpm run build",
     "test": "vitest run"
   },
+  "packageManager": "pnpm@10.28.0",
   "engines": {
     "node": ">=18"
   },
