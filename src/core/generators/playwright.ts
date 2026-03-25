@@ -1,4 +1,10 @@
-import type { Case, Screen, Setup } from './schema.js';
+import type { Case, Screen, Setup } from '../schema.js';
+import type { FrameworkGenerator } from './types.js';
+
+export const playwright: FrameworkGenerator = {
+  generate: generateTestFile,
+  fileNameFor: (screenId) => `${screenId}.spec.ts`,
+};
 
 export function generateTestFile(screen: Screen, setups: Setup[]): string {
   const setupTitles = new Map(setups.map((setup) => [setup.setup, setup.title]));
