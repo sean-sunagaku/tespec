@@ -1,0 +1,6 @@
+screen: broken
+route: /broken
+title: 壊れたYAML
+cases:
+  - action: 画面を開く
+   expect: ここはインデントが壊れている

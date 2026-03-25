@@ -1,0 +1,6 @@
+screen: home
+route: /
+title: ホーム画面
+cases:
+  - action: 画面を開く
+    expect: 一覧が表示される

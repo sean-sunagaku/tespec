@@ -1,0 +1,4 @@
+setup: seed_projects
+title: シードデータ
+steps:
+  - プロジェクトを3件作成する

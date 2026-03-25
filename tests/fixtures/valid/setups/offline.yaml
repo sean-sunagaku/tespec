@@ -1,0 +1,4 @@
+setup: offline
+title: オフライン状態
+steps:
+  - ネットワークを切断する

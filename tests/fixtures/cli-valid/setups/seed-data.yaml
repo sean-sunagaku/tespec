@@ -1,0 +1,4 @@
+setup: seed_projects
+title: プロジェクトが3件ある
+steps:
+  - シードデータを投入する

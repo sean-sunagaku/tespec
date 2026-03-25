@@ -1,0 +1,18 @@
+screen: login
+route: /login
+title: ログイン画面
+cases:
+  - action: 画面を開く
+    expect: メールアドレスとパスワードのフォームが表示される
+
+  - type: error
+    action: 誤った資格情報でログインボタンをタップ
+    expect: エラーメッセージが表示される
+    not_expect:
+      - ホーム画面に遷移する
+
+  - type: boundary
+    action: 256文字のメールアドレスを入力する
+    expect: バリデーションメッセージが表示される
+    not_expect:
+      - 送信が成功する

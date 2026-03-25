@@ -1,0 +1,4 @@
+setup: logged_in
+title: ログイン済み状態
+steps:
+  - テストユーザーでログイン

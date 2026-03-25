@@ -1,0 +1,16 @@
+screen: home
+route: /
+title: ホーム画面
+cases:
+  - action: 画面を開く
+    given: logged_in
+    expect: 一覧が表示される
+    type: normal
+  - action: 画面を開く
+    given: offline
+    expect: エラーが表示される
+    type: error
+  - action: 画面を開く
+    given: no_projects
+    expect: 空状態が表示される
+    type: boundary

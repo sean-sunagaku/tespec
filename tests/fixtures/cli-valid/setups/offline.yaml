@@ -1,0 +1,4 @@
+setup: offline
+title: ネットワークオフライン
+steps:
+  - オフラインモードに切り替える

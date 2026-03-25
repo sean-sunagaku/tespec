@@ -1,0 +1,17 @@
+screen: home
+route: "/"
+title: "ホーム画面"
+cases:
+  - given:
+      - "logged_in"
+      - "seed_projects"
+    action: "画面を開く"
+    expect: "一覧が表示される"
+  - type: error
+    given: "logged_in"
+    action: "削除に失敗する"
+    expect: "エラーメッセージが表示される"
+  - type: boundary
+    given: "seed_projects"
+    action: "100件で開く"
+    expect: "ページネーションが表示される"

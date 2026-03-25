@@ -1,0 +1,5 @@
+screen: broken
+route: /broken
+title: Broken
+cases:
+  - expect: 操作名がない

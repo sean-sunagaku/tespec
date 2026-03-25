@@ -1,0 +1,59 @@
+screen: home
+route: /
+title: ホーム画面
+cases:
+  - given: logged_in
+    action: 画面を開く
+    expect:
+      - プロジェクト一覧が表示される
+      - ナビゲーションバーにユーザー名が表示される
+
+  - given:
+      - logged_in
+      - seed_projects
+    target: プロジェクトカード
+    action: タップ
+    expect:
+      - プロジェクトの詳細情報が表示される
+      - 選択したプロジェクトの内容が確認できる
+    not_expect:
+      - 他のプロジェクトの情報が混在する
+
+  - given: logged_in
+    target: ログアウトボタン
+    action: タップ
+    expect: ログイン画面に遷移する
+    navigates_to: login
+
+  - target: 新規作成ボタン
+    action: タップ
+    expect:
+      - 作成ダイアログが表示される
+      - フォームが空の状態で表示される
+      - 背景がオーバーレイで暗くなる
+
+  - type: error
+    action: サーバーエラー状態で画面を開く
+    expect:
+      - エラーメッセージが表示される
+      - リトライボタンが表示される
+    not_expect:
+      - 空の一覧が表示される
+
+  - type: error
+    action: セッション切れ状態で画面を開く
+    expect: ログイン画面にリダイレクトされる
+    navigates_to: login
+
+  - type: boundary
+    action: プロジェクトが0件の状態で画面を開く
+    expect: 空状態メッセージが表示される
+    not_expect:
+      - エラーメッセージが表示される
+
+  - type: boundary
+    given: logged_in
+    action: プロジェクトが100件ある状態で画面を開く
+    expect:
+      - ページネーションが表示される
+      - 最初の20件が表示される

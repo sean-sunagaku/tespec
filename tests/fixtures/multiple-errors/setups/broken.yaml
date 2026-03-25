@@ -1,0 +1,5 @@
+setup: broken
+title: Broken
+steps:
+  - first
+   bad-indent: true

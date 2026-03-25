@@ -1,0 +1,70 @@
+{
+  "name": "tespec",
+  "version": "0.1.0",
+  "description": "CLI for validating YAML-based screen specs and generating Playwright test skeletons.",
+  "author": "sean-sunagaku",
+  "type": "module",
+  "bin": {
+    "tespec": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "main": "./dist/cli.js",
+  "module": "./dist/cli.js",
+  "types": "./dist/cli.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/cli.d.ts",
+      "import": "./dist/cli.js",
+      "default": "./dist/cli.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "prepublishOnly": "npm test && npm run build",
+    "test": "vitest run"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sean-sunagaku/tespec.git"
+  },
+  "keywords": [
+    "cli",
+    "yaml",
+    "playwright",
+    "testing",
+    "spec"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sean-sunagaku/tespec/issues"
+  },
+  "homepage": "https://github.com/sean-sunagaku/tespec#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@oclif/core": "^4.10.2",
+    "picocolors": "^1.1.1",
+    "yaml": "^2.8.1",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.2",
+    "vitest": "^4.1.1"
+  },
+  "oclif": {
+    "bin": "tespec",
+    "commands": "./dist/commands"
+  }
+}

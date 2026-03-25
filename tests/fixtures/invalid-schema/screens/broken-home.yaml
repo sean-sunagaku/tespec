@@ -1,0 +1,6 @@
+screen: broken-home
+route: 123
+title: 壊れたホーム画面
+cases:
+  - action: 画面を開く
+    expect: 一覧が表示される

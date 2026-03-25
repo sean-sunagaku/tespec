@@ -1,0 +1,107 @@
+import type { Case, Screen, Setup } from './schema.js';
+
+export function generateTestFile(screen: Screen, setups: Setup[]): string {
+  const setupTitles = new Map(setups.map((setup) => [setup.setup, setup.title]));
+  const normalCases = screen.cases.filter((testCase) => testCase.type === 'normal');
+  const errorCases = screen.cases.filter((testCase) => testCase.type === 'error');
+  const boundaryCases = screen.cases.filter((testCase) => testCase.type === 'boundary');
+
+  const lines = [
+    'import { test, expect } from "@playwright/test";',
+    '',
+    `test.describe(${quote(screen.title)}, () => {`,
+    ...renderCaseGroup(normalCases, setupTitles, 1),
+    ...renderNestedGroup('異常系', errorCases, setupTitles, 1),
+    ...renderNestedGroup('境界値', boundaryCases, setupTitles, 1),
+    '});',
+  ];
+
+  return `${lines.join('\n')}\n`;
+}
+
+function renderNestedGroup(
+  title: string,
+  cases: Case[],
+  setupTitles: Map<string, string>,
+  depth: number,
+): string[] {
+  if (cases.length === 0) {
+    return [];
+  }
+
+  const indent = indentOf(depth);
+
+  return [
+    `${indent}test.describe(${quote(title)}, () => {`,
+    ...renderCaseGroup(cases, setupTitles, depth + 1),
+    `${indent}});`,
+  ];
+}
+
+function renderCaseGroup(
+  cases: Case[],
+  setupTitles: Map<string, string>,
+  depth: number,
+): string[] {
+  return cases.flatMap((testCase) => renderCase(testCase, setupTitles, depth));
+}
+
+function renderCase(
+  testCase: Case,
+  setupTitles: Map<string, string>,
+  depth: number,
+): string[] {
+  const indent = indentOf(depth);
+  const innerIndent = indentOf(depth + 1);
+  const comments = buildComments(testCase, setupTitles, depth + 1);
+
+  return [
+    `${indent}test(${quote(buildTestName(testCase))}, async () => {`,
+    ...comments,
+    `${innerIndent}// TODO: implement`,
+    `${indent}});`,
+  ];
+}
+
+function buildTestName(testCase: Case): string {
+  const expectation = Array.isArray(testCase.expect) ? testCase.expect[0] : testCase.expect;
+  const title = `${testCase.action} → ${expectation}`;
+
+  if (testCase.type === 'normal' || typeof testCase.given === 'undefined') {
+    return title;
+  }
+
+  const givenValues = Array.isArray(testCase.given) ? testCase.given : [testCase.given];
+  return `[${givenValues.join(', ')}] ${title}`;
+}
+
+function buildComments(
+  testCase: Case,
+  setupTitles: Map<string, string>,
+  depth: number,
+): string[] {
+  const indent = indentOf(depth);
+  const comments: string[] = [];
+
+  if (typeof testCase.given !== 'undefined') {
+    const givenValues = Array.isArray(testCase.given) ? testCase.given : [testCase.given];
+    const resolved = givenValues.map((given) => setupTitles.get(given) ?? given);
+    comments.push(`${indent}// Given: ${resolved.join(', ')}`);
+  }
+
+  if (Array.isArray(testCase.not_expect)) {
+    for (const entry of testCase.not_expect) {
+      comments.push(`${indent}// not_expect: ${entry}`);
+    }
+  }
+
+  return comments;
+}
+
+function indentOf(depth: number): string {
+  return '  '.repeat(depth);
+}
+
+function quote(value: string): string {
+  return JSON.stringify(value);
+}

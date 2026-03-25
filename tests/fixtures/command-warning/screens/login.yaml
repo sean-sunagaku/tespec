@@ -1,0 +1,6 @@
+screen: login
+route: "/login"
+title: "ログイン画面"
+cases:
+  - action: "画面を開く"
+    expect: "フォームが表示される"

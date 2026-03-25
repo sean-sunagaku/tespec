@@ -1,0 +1,5 @@
+screen: broken-login
+route: /broken-login
+title: 壊れたログイン画面
+cases:
+  - expect: フォームが表示される

@@ -1,0 +1,8 @@
+screen: broken
+route: /broken
+title: 参照エラー画面
+cases:
+  - action: 画面を開く
+    given: missing_setup
+    expect: 何かが表示される
+    navigates_to: missing_screen

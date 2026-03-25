@@ -1,0 +1,4 @@
+version: 1
+project: "command-ok"
+screens_dir: "./screens"
+setups_dir: "./setups"

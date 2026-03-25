@@ -1,0 +1,4 @@
+setup: no_projects
+title: プロジェクト0件
+steps:
+  - プロジェクトデータを削除する

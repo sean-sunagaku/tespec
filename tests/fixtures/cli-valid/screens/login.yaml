@@ -1,0 +1,12 @@
+screen: login
+route: /login
+title: ログイン画面
+cases:
+  - action: 画面を開く
+    expect: フォームが表示される
+  - action: 誤った認証情報で送信する
+    expect: エラーが表示される
+    type: error
+  - action: 256文字のメールアドレスを入力する
+    expect: バリデーションが表示される
+    type: boundary

@@ -1,0 +1,5 @@
+screen: invalid-screen
+route: /invalid
+title: Invalid Screen
+cases:
+  - expect: action がない
