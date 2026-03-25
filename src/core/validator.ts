@@ -19,6 +19,7 @@ export function validate(screens: Screen[], setups: Setup[]): ValidationResult {
 
   checkDuplicateScreenIds(screens, issues);
   checkGivenReferences(screens, setupIds, issues);
+  checkStepsReferences(screens, setupIds, issues);
   checkNavigatesToReferences(screens, screenIds, issues);
   checkEmptyCases(screens, issues);
   checkErrorTypeMissing(screens, issues);
@@ -68,6 +69,33 @@ function checkGivenReferences(
       }
     }
   }
+}
+
+function checkStepsReferences(
+  screens: Screen[],
+  setupIds: Set<string>,
+  issues: ValidationIssue[],
+): void {
+  for (const screen of screens) {
+    for (const [index, testCase] of screen.cases.entries()) {
+      for (const [stepIndex, step] of testCase.steps.entries()) {
+        const ref = parseUseRef(step);
+        if (ref && !setupIds.has(ref)) {
+          issues.push({
+            level: 'error',
+            file: toScreenFile(screen.screen),
+            field: `cases[${index}].steps[${stepIndex}]`,
+            message: `use:${ref} → setup が見つからない`,
+          });
+        }
+      }
+    }
+  }
+}
+
+function parseUseRef(step: string): string | undefined {
+  const match = step.match(/^use:(.+)$/);
+  return match ? match[1] : undefined;
 }
 
 function checkNavigatesToReferences(

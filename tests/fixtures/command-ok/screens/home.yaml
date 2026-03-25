@@ -6,12 +6,23 @@ cases:
       - "logged_in"
       - "seed_projects"
     action: "画面を開く"
+    steps:
+      - "use:logged_in"
+      - "use:seed_projects"
+      - "/ にアクセスする"
     expect: "一覧が表示される"
   - type: error
     given: "logged_in"
     action: "削除に失敗する"
+    steps:
+      - "use:logged_in"
+      - "/ にアクセスする"
+      - "削除ボタンをクリックする"
     expect: "エラーメッセージが表示される"
   - type: boundary
     given: "seed_projects"
     action: "100件で開く"
+    steps:
+      - "use:seed_projects"
+      - "/ にアクセスする"
     expect: "ページネーションが表示される"

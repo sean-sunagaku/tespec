@@ -4,5 +4,8 @@ title: 参照エラー画面
 cases:
   - action: 画面を開く
     given: missing_setup
+    steps:
+      - "use:missing_setup"
+      - /broken にアクセスする
     expect: 何かが表示される
     navigates_to: missing_screen

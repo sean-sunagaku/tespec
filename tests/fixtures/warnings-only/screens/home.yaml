@@ -3,4 +3,6 @@ route: /
 title: ホーム画面
 cases:
   - action: 画面を開く
+    steps:
+      - / にアクセスする
     expect: 一覧が表示される

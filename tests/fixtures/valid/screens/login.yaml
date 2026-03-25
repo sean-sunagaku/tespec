@@ -3,12 +3,21 @@ route: /login
 title: ログイン画面
 cases:
   - action: 画面を開く
+    steps:
+      - /login にアクセスする
     expect: フォームが表示される
     type: normal
   - action: ログインする
+    steps:
+      - /login にアクセスする
+      - 誤った認証情報を入力する
+      - ログインボタンをクリックする
     expect: ホーム画面に遷移する
     navigates_to: home
     type: error
   - action: 長いメールアドレスを入力する
+    steps:
+      - /login にアクセスする
+      - 256文字のメールアドレスを入力する
     expect: バリデーションメッセージが表示される
     type: boundary
