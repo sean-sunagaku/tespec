@@ -26,6 +26,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
+    "publish:check": "npm pack --dry-run",
+    "publish:package": "npm publish",
     "prepublishOnly": "npm test && npm run build",
     "test": "vitest run"
   },
