@@ -29,11 +29,13 @@
     "lint": "biome lint ./src ./tests",
     "fmt": "biome format --write ./src ./tests",
     "check": "biome check --write ./src ./tests",
+    "check:ci": "biome check ./src ./tests",
     "publish:check": "pnpm pack --dry-run",
     "publish:package": "pnpm publish",
     "prepublishOnly": "pnpm test && pnpm run build",
     "test": "vitest run"
   },
+  "packageManager": "pnpm@10.28.0",
   "engines": {
     "node": ">=18"
   },

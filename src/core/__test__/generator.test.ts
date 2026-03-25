@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
-
-import type { Screen, Setup } from '../schema.js';
 import { generateTestFile } from '../generator.js';
+import type { Screen, Setup } from '../schema.js';
 
 const setups: Setup[] = [
   { setup: 'logged_in', title: 'ログイン済み状態', steps: ['login'] },

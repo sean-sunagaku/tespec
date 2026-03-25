@@ -1,16 +1,15 @@
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
-
-import type { ZodIssue, ZodType } from 'zod';
 import { parseDocument } from 'yaml';
+import type { ZodIssue, ZodType } from 'zod';
 
 import {
-  ConfigSchema,
   type Config,
-  ScreenSchema,
+  ConfigSchema,
   type Screen,
-  SetupSchema,
+  ScreenSchema,
   type Setup,
+  SetupSchema,
 } from './schema.js';
 
 export interface ParsedProject {
