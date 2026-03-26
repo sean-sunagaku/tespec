@@ -1,0 +1,8 @@
+screen: home
+route: /
+title: Home
+cases:
+  - action: open home
+    steps:
+      - open /
+    expect: home is visible

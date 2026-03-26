@@ -62,6 +62,41 @@ describe.sequential('generate command', () => {
     expect(result.stdout).not.toContain('files generated');
   });
 
+  it('prints Screen and Unit skeletons on dry-run when units_dir is configured', async () => {
+    const result = await runCommand(Generate, [
+      '--config',
+      configPath('command-unit-ok'),
+      '--dry-run',
+      '--out-dir',
+      'tests/generated',
+    ]);
+
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain('// tests/generated/login.spec.ts');
+    expect(result.stdout).toContain('// tests/generated/user-service.test.ts');
+    expect(result.stdout).toContain('test.describe("ログイン画面"');
+    expect(result.stdout).toContain('import { describe, it, expect } from');
+    expect(result.stdout).toContain('createUser');
+    expect(result.stdout).toContain('DuplicateEmailError');
+    expect(result.stdout).toContain('files generated');
+  });
+
+  it('returns exit 1 and does not generate when unit validation errors exist', async () => {
+    const result = await runCommand(Generate, [
+      '--config',
+      configPath('command-unit-error'),
+      '--dry-run',
+      '--out-dir',
+      'tests/generated',
+    ]);
+
+    expect(result.code).toBe(1);
+    expect(result.stderr).toContain('ERROR:');
+    expect(result.stderr).toContain('unit ID "user-service" が重複しています');
+    expect(result.stdout).not.toContain('// tests/generated/user-service.test.ts');
+    expect(result.stdout).not.toContain('files generated');
+  });
+
   it('filters generation by screen ID', async () => {
     const result = await runCommand(Generate, [
       '--config',
@@ -82,6 +117,41 @@ describe.sequential('generate command', () => {
       '誤った認証情報を入力する',
       '送信ボタンをクリックする',
     ]);
+  });
+
+  it('filters generation by unit ID', async () => {
+    const result = await runCommand(Generate, [
+      '--config',
+      configPath('command-unit-ok'),
+      '--dry-run',
+      '--out-dir',
+      'tests/generated',
+      '--unit',
+      'user-service',
+    ]);
+
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain('// tests/generated/user-service.test.ts');
+    expect(result.stdout).not.toContain('// tests/generated/login.spec.ts');
+    expect(result.stdout).toContain('createUser');
+    expect(result.stdout).toContain('DuplicateEmailError');
+  });
+
+  it('supports a separate unit target', async () => {
+    const result = await runCommand(Generate, [
+      '--config',
+      configPath('command-unit-ok'),
+      '--dry-run',
+      '--out-dir',
+      'tests/generated',
+      '--unit-target',
+      'xctest',
+    ]);
+
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain('// tests/generated/login.spec.ts');
+    expect(result.stdout).toContain('// tests/generated/UserServiceTests.swift');
+    expect(result.stdout).toContain('final class UserServiceTests: XCTestCase');
   });
 
   it('writes generated files to a custom output directory', async () => {
@@ -107,5 +177,26 @@ describe.sequential('generate command', () => {
     ]);
     expect(loginSpec).toContain('test.describe("ログイン画面"');
     expectStepsInOrder(loginSpec, ['/login にアクセスする']);
+  });
+
+  it('writes generated unit files to a custom output directory', async () => {
+    const outputDir = await mkdtemp(resolve(tmpdir(), 'tespec-generate-unit-'));
+
+    const result = await runCommand(Generate, [
+      '--config',
+      configPath('command-unit-ok'),
+      '--out-dir',
+      outputDir,
+    ]);
+
+    expect(result.code).toBe(0);
+
+    const loginSpec = await readFile(resolve(outputDir, 'login.spec.ts'), 'utf8');
+    const unitSpec = await readFile(resolve(outputDir, 'user-service.test.ts'), 'utf8');
+
+    expect(loginSpec).toContain('test.describe("ログイン画面"');
+    expect(unitSpec).toContain('import { describe, it, expect } from');
+    expect(unitSpec).toContain('createUser');
+    expect(unitSpec).toContain('ValidationError');
   });
 });

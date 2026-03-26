@@ -1,0 +1,6 @@
+unit: user-service
+methods:
+  - method: createUser
+    cases:
+      - action: "有効なメールで作成"
+        expect: "User が返る"

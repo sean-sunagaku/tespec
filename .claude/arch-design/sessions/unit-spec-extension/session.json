@@ -1,0 +1,33 @@
+{
+  "sessionId": "unit-spec-extension",
+  "topic": "tespec Unit Spec 拡張 - クラス単体テスト仕様の YAML サポート追加",
+  "status": "in_progress",
+  "mode": "standard",
+  "currentStep": 1,
+  "createdAt": "2026-03-26T00:00:00Z",
+  "updatedAt": "2026-03-26T00:00:00Z",
+  "techStack": {
+    "language": "TypeScript (ESM)",
+    "framework": "oclif v4",
+    "schemaValidation": "Zod v4",
+    "packageManager": "pnpm",
+    "testRunner": "vitest",
+    "buildTool": "tsup"
+  },
+  "designPolicy": {
+    "schemaApproach": "independent - Unit Spec の Zod スキーマは Screen とは完全独立定義",
+    "generatorTargets": ["vitest", "xctest"],
+    "commandBehavior": "デフォルト全処理、--type で screen/unit 絞り込み",
+    "futureSpecTypes": "screen transition spec (画面遷移) くらい。最大3種類程度",
+    "yamlFormat": "unit: トップレベルキー、methods: でネスト、units/ ディレクトリ",
+    "configExtension": "units_dir を config.yaml に追加"
+  },
+  "steps": {
+    "1_context": false,
+    "2_pattern": false,
+    "3_modules": false,
+    "4_output": false
+  },
+  "selectedPattern": null,
+  "modules": []
+}

@@ -1,15 +1,37 @@
-import { playwright } from './playwright.js';
-import type { FrameworkGenerator, Target } from './types.js';
-import { xctest } from './xctest.js';
+import { playwright } from './screen/playwright.js';
+import { xctest as screenXctest } from './screen/xctest.js';
+import type { ScreenGenerator, ScreenTarget, UnitGenerator, UnitTarget } from './types.js';
+import { vitest } from './unit/vitest.js';
+import { xctest as unitXctest } from './unit/xctest.js';
 
-const REGISTRY: Record<Target, FrameworkGenerator> = { playwright, xctest };
+const SCREEN_REGISTRY: Record<ScreenTarget, ScreenGenerator> = {
+  playwright,
+  xctest: screenXctest,
+};
 
-export function getGenerator(target: Target): FrameworkGenerator {
-  return REGISTRY[target];
+export function getScreenGenerator(target: ScreenTarget): ScreenGenerator {
+  return SCREEN_REGISTRY[target];
 }
 
-export const AVAILABLE_TARGETS: readonly Target[] = Object.keys(REGISTRY) as Target[];
+export const SCREEN_TARGETS: readonly ScreenTarget[] = Object.keys(
+  SCREEN_REGISTRY,
+) as ScreenTarget[];
 
-export function isTarget(value: string): value is Target {
-  return (AVAILABLE_TARGETS as readonly string[]).includes(value);
+export function isScreenTarget(value: string): value is ScreenTarget {
+  return (SCREEN_TARGETS as readonly string[]).includes(value);
+}
+
+const UNIT_REGISTRY: Record<UnitTarget, UnitGenerator> = {
+  vitest,
+  xctest: unitXctest,
+};
+
+export function getUnitGenerator(target: UnitTarget): UnitGenerator {
+  return UNIT_REGISTRY[target];
+}
+
+export const UNIT_TARGETS: readonly UnitTarget[] = Object.keys(UNIT_REGISTRY) as UnitTarget[];
+
+export function isUnitTarget(value: string): value is UnitTarget {
+  return (UNIT_TARGETS as readonly string[]).includes(value);
 }

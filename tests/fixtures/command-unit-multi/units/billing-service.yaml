@@ -1,0 +1,13 @@
+unit: billing-service
+title: "課金サービス"
+methods:
+  - method: charge
+    cases:
+      - action: "有効なカードで課金する"
+        expect: "Receipt が返る"
+      - action: "限度額超過で課金する"
+        expect: "CardDeclinedError"
+        type: error
+      - action: "0円で課金する"
+        expect: "ValidationError"
+        type: boundary

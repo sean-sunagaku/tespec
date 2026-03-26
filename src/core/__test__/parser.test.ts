@@ -22,9 +22,23 @@ describe('parseProject', () => {
     expect(result).toBeDefined();
     expect(result?.config.project).toBe('tespec-valid');
     expect(result?.screens).toHaveLength(2);
+    expect(result?.units).toEqual([]);
     expect(result?.setups.map((setup) => setup.setup)).toEqual(
       expect.arrayContaining(['logged_in', 'seed_projects']),
     );
+  });
+
+  it('parses units when units_dir is configured', async () => {
+    const { result, errors } = await parseProject(fixtureConfigPath('unit-parse-valid'));
+
+    expect(errors).toEqual([]);
+    expect(result).toBeDefined();
+    expect(result?.units).toHaveLength(1);
+    expect(result?.units[0]).toMatchObject({
+      unit: 'user-service',
+      title: 'User service',
+    });
+    expect(result?.units[0]?.methods.map((method) => method.method)).toEqual(['createUser']);
   });
 
   it('collects schema errors across multiple files without stopping at the first one', async () => {
@@ -54,6 +68,20 @@ describe('parseProject', () => {
     expect(errors[0]?.file).toContain(path.join('invalid-yaml', 'screens', 'broken.yaml'));
     expect(errors[0]?.message).toContain('line');
     expect(errors[0]?.message).toContain('column');
+  });
+
+  it('collects unit schema errors when unit files are invalid', async () => {
+    const { result, errors } = await parseProject(fixtureConfigPath('unit-parse-invalid'));
+
+    expect(result).toBeUndefined();
+    expect(errors.map((error) => error.file)).toEqual(
+      expect.arrayContaining([
+        path.join(fixturesRoot, 'unit-parse-invalid', 'units', 'missing-action.yaml'),
+      ]),
+    );
+    expect(errors.map((error) => error.message)).toEqual(
+      expect.arrayContaining([expect.stringContaining('methods.0.cases.0.action')]),
+    );
   });
 
   it('allows an empty screens directory', async () => {
