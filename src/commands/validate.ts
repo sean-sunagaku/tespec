@@ -3,7 +3,8 @@ import path from 'node:path';
 import { Command, Flags } from '@oclif/core';
 
 import { type ParseError, parseProject, parseYamlFile } from '../core/parser.js';
-import { ScreenSchema, SetupSchema } from '../core/schema.js';
+import { ScreenSchema, SetupSchema, UnitSpecSchema } from '../core/schema.js';
+import { validateUnits } from '../core/unit-validator.js';
 import { validate } from '../core/validator.js';
 import { printError, printOk, printWarning } from '../utils/output.js';
 
@@ -45,9 +46,11 @@ export default class Validate extends Command {
       this.exit(1);
     }
 
-    const validation = validate(parsed.result.screens, parsed.result.setups);
+    const screenValidation = validate(parsed.result.screens, parsed.result.setups);
+    const unitValidation = validateUnits(parsed.result.units);
+    const issues = [...screenValidation.issues, ...unitValidation.issues];
 
-    for (const issue of validation.issues) {
+    for (const issue of issues) {
       const message = `${issue.field}: ${issue.message}`;
 
       if (issue.level === 'error') {
@@ -58,7 +61,7 @@ export default class Validate extends Command {
     }
 
     const errorFiles = new Set(
-      validation.issues.filter((issue) => issue.level === 'error').map((issue) => issue.file),
+      issues.filter((issue) => issue.level === 'error').map((issue) => issue.file),
     );
 
     for (const screen of parsed.result.screens) {
@@ -69,7 +72,15 @@ export default class Validate extends Command {
       }
     }
 
-    if (validation.hasErrors) {
+    for (const unit of parsed.result.units) {
+      const unitFile = toUnitFile(unit.unit);
+
+      if (!errorFiles.has(unitFile)) {
+        printOk(unitFile);
+      }
+    }
+
+    if (screenValidation.hasErrors || unitValidation.hasErrors) {
       this.exit(1);
     }
   }
@@ -89,7 +100,18 @@ export default class Validate extends Command {
       return;
     }
 
-    for (const error of selectSingleFileErrors(filePath, screenResult.errors, setupResult.errors)) {
+    const unitResult = await parseYamlFile(filePath, UnitSpecSchema);
+    if (unitResult.data) {
+      printOk(toDisplayPath(filePath));
+      return;
+    }
+
+    for (const error of selectSingleFileErrors(
+      filePath,
+      screenResult.errors,
+      setupResult.errors,
+      unitResult.errors,
+    )) {
       printError(toDisplayPath(error.file), error.message);
     }
 
@@ -105,16 +127,32 @@ function toScreenFile(screenId: string): string {
   return `screens/${screenId}.yaml`;
 }
 
+function toUnitFile(unitId: string): string {
+  return `units/${unitId}.yaml`;
+}
+
 function selectSingleFileErrors(
   filePath: string,
   screenErrors: ParseError[],
   setupErrors: ParseError[],
+  unitErrors: ParseError[],
 ): ParseError[] {
-  if (hasReadOrYamlError(screenErrors) || hasReadOrYamlError(setupErrors)) {
-    return screenErrors;
+  const parseErrors = [screenErrors, setupErrors, unitErrors].find(hasReadOrYamlError);
+  if (parseErrors) {
+    return parseErrors;
   }
 
-  return filePath.replaceAll('\\', '/').includes('/setups/') ? setupErrors : screenErrors;
+  const normalizedPath = filePath.replaceAll('\\', '/');
+
+  if (normalizedPath.includes('/units/')) {
+    return unitErrors;
+  }
+
+  if (normalizedPath.includes('/setups/')) {
+    return setupErrors;
+  }
+
+  return screenErrors;
 }
 
 function hasReadOrYamlError(errors: ParseError[]): boolean {

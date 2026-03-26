@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { CaseSchema, ConfigSchema, ScreenSchema, SetupSchema } from '../schema.js';
+import {
+  CaseSchema,
+  ConfigSchema,
+  ScreenSchema,
+  SetupSchema,
+  UnitCaseSchema,
+  UnitSpecSchema,
+} from '../schema.js';
 
 describe('schema', () => {
   it('rejects missing required fields', () => {
@@ -17,6 +24,15 @@ describe('schema', () => {
       action: 'open screen',
       expect: 'home is visible',
       steps: ['open /'],
+    });
+
+    expect(result.type).toBe('normal');
+  });
+
+  it('fills the default unit case type value when omitted', () => {
+    const result = UnitCaseSchema.parse({
+      action: 'create user',
+      expect: 'user is returned',
     });
 
     expect(result.type).toBe('normal');
@@ -90,14 +106,41 @@ describe('schema', () => {
       title: 'Logged in',
       steps: ['sign in'],
     });
+    const unit = UnitSpecSchema.parse({
+      unit: 'user-service',
+      title: 'User service',
+      methods: [
+        {
+          method: 'createUser',
+          cases: [
+            {
+              action: 'create user',
+              expect: ['user is returned', 'repository is called'],
+            },
+          ],
+        },
+      ],
+    });
+    const config = ConfigSchema.parse({
+      version: 1,
+      project: 'tespec',
+      units_dir: './units',
+    });
+
+    expect(screen.screen).toBe('login');
+    expect(setup.setup).toBe('logged_in');
+    expect(unit.methods[0]?.cases[0]?.type).toBe('normal');
+    expect(config.screens_dir).toBe('./screens');
+    expect(config.setups_dir).toBe('./setups');
+    expect(config.units_dir).toBe('./units');
+  });
+
+  it('keeps units_dir optional in config', () => {
     const config = ConfigSchema.parse({
       version: 1,
       project: 'tespec',
     });
 
-    expect(screen.screen).toBe('login');
-    expect(setup.setup).toBe('logged_in');
-    expect(config.screens_dir).toBe('./screens');
-    expect(config.setups_dir).toBe('./setups');
+    expect(config.units_dir).toBeUndefined();
   });
 });

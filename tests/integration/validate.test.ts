@@ -64,6 +64,37 @@ describe.sequential('validate command', () => {
     expect(result.stdout).toContain('tests/fixtures/command-ok/setups/auth.yaml');
   });
 
+  it('returns exit 0 and prints OK lines for valid unit specs', async () => {
+    const result = await runCommand(Validate, ['--config', configPath('command-unit-ok')]);
+
+    expect(result.code).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(result.stdout).toContain('OK:');
+    expect(result.stdout).toContain('screens/login.yaml');
+    expect(result.stdout).toContain('units/user-service.yaml');
+  });
+
+  it('returns exit 0 and prints WARN lines for unit warning-only projects', async () => {
+    const result = await runCommand(Validate, ['--config', configPath('command-unit-warning')]);
+
+    expect(result.code).toBe(0);
+    expect(result.stderr).toContain('WARN:');
+    expect(result.stderr).toContain('units/user-service.yaml');
+    expect(result.stderr).toContain('異常系 (type: error) が 0 件');
+    expect(result.stderr).toContain('境界値 (type: boundary) が 0 件');
+    expect(result.stdout).toContain('OK:');
+    expect(result.stdout).toContain('units/user-service.yaml');
+  });
+
+  it('returns exit 1 and prints ERROR lines for invalid unit specs', async () => {
+    const result = await runCommand(Validate, ['--config', configPath('command-unit-error')]);
+
+    expect(result.code).toBe(1);
+    expect(result.stderr).toContain('ERROR:');
+    expect(result.stderr).toContain('units/user-service.yaml');
+    expect(result.stderr).toContain('unit ID "user-service" が重複しています');
+  });
+
   it('returns exit 1 for an invalid YAML via --file', async () => {
     const filePath = fixturePath('invalid-schema', 'screens', 'missing-route.yaml');
     const result = await runCommand(Validate, ['--file', filePath]);
@@ -73,6 +104,27 @@ describe.sequential('validate command', () => {
     expect(result.stderr).toContain('ERROR:');
     expect(result.stderr).toContain('tests/fixtures/invalid-schema/screens/missing-route.yaml');
     expect(result.stderr).toContain('route:');
+  });
+
+  it('returns exit 0 for a valid unit YAML via --file', async () => {
+    const filePath = fixturePath('command-unit-ok', 'units', 'user-service.yaml');
+    const result = await runCommand(Validate, ['--file', filePath]);
+
+    expect(result.code).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(result.stdout).toContain('OK:');
+    expect(result.stdout).toContain('tests/fixtures/command-unit-ok/units/user-service.yaml');
+  });
+
+  it('returns exit 1 for an invalid unit YAML via --file', async () => {
+    const filePath = fixturePath('invalid-unit-schema', 'units', 'missing-title.yaml');
+    const result = await runCommand(Validate, ['--file', filePath]);
+
+    expect(result.code).toBe(1);
+    expect(result.stdout).toBe('');
+    expect(result.stderr).toContain('ERROR:');
+    expect(result.stderr).toContain('tests/fixtures/invalid-unit-schema/units/missing-title.yaml');
+    expect(result.stderr).toContain('title:');
   });
 
   it('returns exit 1 when --file and --config are passed together', async () => {

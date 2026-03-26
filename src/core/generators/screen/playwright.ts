@@ -1,31 +1,31 @@
-import type { Case, Screen, Setup } from '../schema.js';
-import type { FrameworkGenerator } from './types.js';
+import type { Case, Screen, Setup } from '../../schema.js';
+import type { ScreenGenerator } from '../types.js';
 
-export const xctest: FrameworkGenerator = {
-  generate: generateSwiftTestFile,
-  fileNameFor: (screenId) => `${toSwiftClassName(screenId)}Tests.swift`,
+export const playwright: ScreenGenerator = {
+  generate: generateTestFile,
+  fileNameFor: (screenId) => `${screenId}.spec.ts`,
 };
 
-export function generateSwiftTestFile(screen: Screen, setups: Setup[]): string {
+export function generateTestFile(screen: Screen, setups: Setup[]): string {
   const setupTitles = new Map(setups.map((setup) => [setup.setup, setup.title]));
   const normalCases = screen.cases.filter((testCase) => testCase.type === 'normal');
   const errorCases = screen.cases.filter((testCase) => testCase.type === 'error');
   const boundaryCases = screen.cases.filter((testCase) => testCase.type === 'boundary');
 
   const lines = [
-    'import XCTest',
+    'import { test, expect } from "@playwright/test";',
     '',
-    `final class ${toSwiftClassName(screen.screen)}Tests: XCTestCase {`,
+    `test.describe(${quote(screen.title)}, () => {`,
     ...renderCaseGroup(normalCases, setupTitles, 1),
-    ...renderMarkedGroup('異常系', errorCases, setupTitles, 1),
-    ...renderMarkedGroup('境界値', boundaryCases, setupTitles, 1),
-    '}',
+    ...renderNestedGroup('異常系', errorCases, setupTitles, 1),
+    ...renderNestedGroup('境界値', boundaryCases, setupTitles, 1),
+    '});',
   ];
 
   return `${lines.join('\n')}\n`;
 }
 
-function renderMarkedGroup(
+function renderNestedGroup(
   title: string,
   cases: Case[],
   setupTitles: Map<string, string>,
@@ -37,7 +37,11 @@ function renderMarkedGroup(
 
   const indent = indentOf(depth);
 
-  return ['', `${indent}// MARK: - ${title}`, '', ...renderCaseGroup(cases, setupTitles, depth)];
+  return [
+    `${indent}test.describe(${quote(title)}, () => {`,
+    ...renderCaseGroup(cases, setupTitles, depth + 1),
+    `${indent}});`,
+  ];
 }
 
 function renderCaseGroup(cases: Case[], setupTitles: Map<string, string>, depth: number): string[] {
@@ -50,23 +54,23 @@ function renderCase(testCase: Case, setupTitles: Map<string, string>, depth: num
   const comments = buildComments(testCase, setupTitles, depth + 1);
 
   return [
-    `${indent}func ${buildFuncName(testCase)}() {`,
+    `${indent}test(${quote(buildTestName(testCase))}, async () => {`,
     ...comments,
     `${innerIndent}// TODO: implement`,
-    `${indent}}`,
+    `${indent}});`,
   ];
 }
 
-function buildFuncName(testCase: Case): string {
+function buildTestName(testCase: Case): string {
   const expectation = Array.isArray(testCase.expect) ? testCase.expect[0] : testCase.expect;
-  const base = `test_${sanitize(testCase.action)}_${sanitize(expectation)}`;
+  const title = `${testCase.action} → ${expectation}`;
 
   if (testCase.type === 'normal' || typeof testCase.given === 'undefined') {
-    return base;
+    return title;
   }
 
   const givenValues = Array.isArray(testCase.given) ? testCase.given : [testCase.given];
-  return `test_${givenValues.map(sanitize).join('_')}_${sanitize(testCase.action)}_${sanitize(expectation)}`;
+  return `[${givenValues.join(', ')}] ${title}`;
 }
 
 function buildComments(testCase: Case, setupTitles: Map<string, string>, depth: number): string[] {
@@ -81,15 +85,15 @@ function buildComments(testCase: Case, setupTitles: Map<string, string>, depth: 
 
   if (testCase.steps.length > 0) {
     comments.push(`${indent}// Steps:`);
-    for (const [i, step] of testCase.steps.entries()) {
+    for (const [index, step] of testCase.steps.entries()) {
       const ref = step.match(/^use:(.+)$/);
       if (ref) {
         const title = setupTitles.get(ref[1]) ?? ref[1];
-        comments.push(`${indent}//   ${i + 1}. [use:${ref[1]}] ${title}`);
+        comments.push(`${indent}//   ${index + 1}. [use:${ref[1]}] ${title}`);
       } else {
-        comments.push(`${indent}//   ${i + 1}. ${step}`);
+        comments.push(`${indent}//   ${index + 1}. ${step}`);
       }
-      if (i < testCase.steps.length - 1) {
+      if (index < testCase.steps.length - 1) {
         comments.push('');
       }
     }
@@ -104,17 +108,10 @@ function buildComments(testCase: Case, setupTitles: Map<string, string>, depth: 
   return comments;
 }
 
-function toSwiftClassName(screenId: string): string {
-  return screenId
-    .split(/[_-]/)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join('');
-}
-
-function sanitize(value: string): string {
-  return value.replace(/\s+/g, '_').replace(/[^\p{L}\p{N}_]/gu, '');
-}
-
 function indentOf(depth: number): string {
-  return '    '.repeat(depth);
+  return '  '.repeat(depth);
+}
+
+function quote(value: string): string {
+  return JSON.stringify(value);
 }

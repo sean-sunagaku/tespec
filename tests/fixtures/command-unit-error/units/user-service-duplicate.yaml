@@ -1,0 +1,13 @@
+unit: user-service
+title: "ユーザーサービス重複"
+methods:
+  - method: deleteUser
+    cases:
+      - action: "存在するユーザーを削除"
+        expect: "正常に削除される"
+      - action: "存在しないユーザーを削除"
+        expect: "NotFoundError"
+        type: error
+      - action: "最小権限で削除"
+        expect: "権限エラー"
+        type: boundary

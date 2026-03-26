@@ -1,0 +1,4 @@
+setup: auth
+title: Authenticated
+steps:
+  - sign in as test user

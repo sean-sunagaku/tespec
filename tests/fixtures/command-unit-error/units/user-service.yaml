@@ -1,0 +1,13 @@
+unit: user-service
+title: "ユーザーサービス"
+methods:
+  - method: createUser
+    cases:
+      - action: "有効なメールで作成"
+        expect: "User が返る"
+      - action: "重複メールで作成"
+        expect: "DuplicateEmailError"
+        type: error
+      - action: "空文字メールで作成"
+        expect: "ValidationError"
+        type: boundary

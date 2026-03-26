@@ -1,0 +1,5 @@
+version: 1
+project: unit-parse-valid
+screens_dir: ./screens
+setups_dir: ./setups
+units_dir: ./units

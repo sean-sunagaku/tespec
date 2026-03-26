@@ -1,0 +1,13 @@
+unit: user-service
+title: User service
+methods:
+  - method: createUser
+    cases:
+      - action: valid email
+        expect: user is returned
+      - action: duplicate email
+        expect: DuplicateEmailError
+        type: error
+      - action: empty email
+        expect: ValidationError
+        type: boundary

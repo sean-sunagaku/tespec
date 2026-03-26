@@ -1,0 +1,6 @@
+unit: user-service
+title: User service
+methods:
+  - method: createUser
+    cases:
+      - expect: user is returned

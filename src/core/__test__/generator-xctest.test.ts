@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { generateSwiftTestFile } from '../generators/xctest.js';
+import { generateSwiftTestFile } from '../generators/screen/xctest.js';
 import type { Screen, Setup } from '../schema.js';
 
 const setups: Setup[] = [

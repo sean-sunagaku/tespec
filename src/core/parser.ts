@@ -10,12 +10,15 @@ import {
   ScreenSchema,
   type Setup,
   SetupSchema,
+  type UnitSpec,
+  UnitSpecSchema,
 } from './schema.js';
 
 export interface ParsedProject {
   config: Config;
   screens: Screen[];
   setups: Setup[];
+  units: UnitSpec[];
 }
 
 export interface ParseError {
@@ -46,13 +49,19 @@ export async function parseProject(
   const configDir = path.dirname(resolvedConfigPath);
   const screensDir = path.resolve(configDir, configResult.data.screens_dir);
   const setupsDir = path.resolve(configDir, configResult.data.setups_dir);
+  const unitsDir = configResult.data.units_dir
+    ? path.resolve(configDir, configResult.data.units_dir)
+    : undefined;
 
-  const [screensResult, setupsResult] = await Promise.all([
+  const [screensResult, setupsResult, unitsResult] = await Promise.all([
     parseYamlDirectory(screensDir, ScreenSchema),
     parseYamlDirectory(setupsDir, SetupSchema),
+    unitsDir
+      ? parseYamlDirectory(unitsDir, UnitSpecSchema)
+      : Promise.resolve({ items: [] as UnitSpec[], errors: [] as ParseError[] }),
   ]);
 
-  const errors = [...screensResult.errors, ...setupsResult.errors];
+  const errors = [...screensResult.errors, ...setupsResult.errors, ...unitsResult.errors];
   if (errors.length > 0) {
     return { errors };
   }
@@ -62,6 +71,7 @@ export async function parseProject(
       config: configResult.data,
       screens: screensResult.items,
       setups: setupsResult.items,
+      units: unitsResult.items,
     },
     errors: [],
   };
