@@ -1,6 +1,6 @@
 import type { Screen, Setup, UnitSpec } from '../schema.js';
 
-export type ScreenTarget = 'playwright' | 'xctest';
+export type ScreenTarget = 'playwright' | 'vitest' | 'xctest';
 
 export interface ScreenGenerator {
   generate(screen: Screen, setups: Setup[]): string;

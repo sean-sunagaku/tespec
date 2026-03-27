@@ -1,4 +1,0 @@
-setup: seed_projects
-title: プロジェクト3件のシードデータ
-steps:
-  - テスト用プロジェクトを3件作成
