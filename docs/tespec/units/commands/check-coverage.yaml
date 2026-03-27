@@ -1,0 +1,40 @@
+unit: check-coverage-command
+title: check-coverage コマンド統合テスト
+methods:
+  - method: run
+    cases:
+      - action: 全 screen がカバーされたプロジェクトでチェックする
+        expect:
+          - exit code が 0
+          - OK 行が出力される
+        type: normal
+      - action: テストファイルが不足しているプロジェクトでチェックする
+        expect:
+          - exit code が 1
+          - ERROR 行が出力される
+        type: normal
+      - action: case 数が不一致のプロジェクトでチェックする
+        expect:
+          - exit code が 0
+          - WARN 行が出力される
+        type: normal
+      - action: 存在しない config.yaml を指定する
+        expect:
+          - exit code が 1
+          - ERROR 行にファイルが見つからないメッセージが含まれる
+        type: error
+      - action: YAML 構文エラーのある config を指定する
+        expect:
+          - exit code が 1
+          - ERROR 行に構文エラーメッセージが含まれる
+        type: error
+      - action: スキーマ不正の screen YAML があるプロジェクトでチェックする
+        expect:
+          - exit code が 1
+          - ERROR 行にスキーマエラーメッセージが含まれる
+        type: error
+      - action: 存在しない tests-dir を指定する
+        expect:
+          - exit code が 1
+          - ERROR 行にディレクトリが見つからないメッセージが含まれる
+        type: error

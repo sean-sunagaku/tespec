@@ -1,0 +1,30 @@
+{
+  "sessionId": "check-coverage-implemented",
+  "topic": "check-coverage & check-implemented コマンドのアーキテクチャ設計",
+  "status": "in_progress",
+  "mode": "light",
+  "currentStep": 1,
+  "createdAt": "2026-03-27T00:00:00Z",
+  "updatedAt": "2026-03-27T00:00:00Z",
+  "techStack": {
+    "language": "TypeScript",
+    "framework": "oclif (CLI)",
+    "testFramework": "Vitest",
+    "schemaValidation": "Zod",
+    "yamlParsing": "yaml"
+  },
+  "designPolicy": {
+    "philosophy": "シンプル最優先 - 既存パターン踏襲",
+    "parsingStrategy": "正規表現ベース (it/test/it.todo 検出)",
+    "futureScope": "CI連携 (JSON出力, exit code)",
+    "testFileMatching": "{id}.test.{ext} / {id}.spec.{ext} 自動検出"
+  },
+  "steps": {
+    "1_context": false,
+    "2_pattern": false,
+    "3_modules": false,
+    "4_output": false
+  },
+  "selectedPattern": null,
+  "modules": []
+}

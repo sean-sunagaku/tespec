@@ -1,0 +1,14 @@
+screen: signup
+route: "/signup"
+title: "サインアップ画面"
+cases:
+  - action: "画面を開く"
+    steps:
+      - "/signup にアクセスする"
+    expect: "フォームが表示される"
+  - type: error
+    action: "重複メールで登録する"
+    steps:
+      - "/signup にアクセスする"
+      - "既存のメールアドレスを入力する"
+    expect: "エラーが表示される"

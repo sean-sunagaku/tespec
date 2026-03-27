@@ -1,0 +1,55 @@
+unit: impl-checker
+title: テスト実装状況チェッカー
+methods:
+  - method: checkImplemented
+    cases:
+      - action: 全テストが実装済みのディレクトリをチェックする
+        expect:
+          - 全エントリの level が ok
+          - hasUnimplemented が false
+        type: normal
+      - action: TODO implement マーカーがあるファイルを検出する
+        expect:
+          - level が warn の issue が含まれる
+          - 未実装数がメッセージに含まれる
+        type: normal
+      - action: it.todo() 呼び出しを検出する
+        expect: todo として検出され未実装カウントに含まれる
+        type: normal
+      - action: test.todo() 呼び出しを検出する
+        expect: todo として検出され未実装カウントに含まれる
+        type: normal
+      - action: it.skip() 呼び出しを検出する
+        expect: skip として検出され未実装カウントに含まれる
+        type: normal
+      - action: test.skip() 呼び出しを検出する
+        expect: skip として検出され未実装カウントに含まれる
+        type: normal
+      - action: テストディレクトリが存在しない
+        expect: エラーが返る
+        type: error
+      - action: テストディレクトリが空
+        expect: issues が空配列で hasUnimplemented が false
+        type: boundary
+      - action: テストファイル内のテストが 0 件
+        expect: total が 0 で implemented も 0
+        type: boundary
+
+  - method: countUnimplemented
+    cases:
+      - action: TODO マーカーなしのファイルを解析する
+        expect:
+          - total がテスト数と一致
+          - unimplemented が 0
+        type: normal
+      - action: TODO implement コメント が含まれるファイルを解析する
+        expect: TODO マーカーの数だけ unimplemented がカウントされる
+        type: normal
+      - action: it.todo() と通常の it() が混在するファイルを解析する
+        expect:
+          - total が全 it() + it.todo() の合計
+          - unimplemented が it.todo() の数
+        type: normal
+      - action: 空のファイルを解析する
+        expect: total が 0 で unimplemented が 0
+        type: boundary
