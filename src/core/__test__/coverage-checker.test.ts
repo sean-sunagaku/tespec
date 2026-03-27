@@ -1,11 +1,10 @@
-import { readFile, writeFile, mkdir, rm } from 'node:fs/promises';
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
-import { describe, expect, it, beforeEach, afterEach } from 'vitest';
-
-import type { Screen, UnitSpec } from '../schema.js';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { checkCoverage, collectTestFiles, countTestCases } from '../coverage-checker.js';
+import type { Screen, UnitSpec } from '../schema.js';
 
 // --- helpers ---
 
@@ -58,7 +57,10 @@ function createUnit(overrides: Partial<UnitSpec> = {}): UnitSpec {
 let tempDir: string;
 
 beforeEach(async () => {
-  tempDir = path.join(tmpdir(), `tespec-coverage-test-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+  tempDir = path.join(
+    tmpdir(),
+    `tespec-coverage-test-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+  );
   await mkdir(tempDir, { recursive: true });
 });
 
@@ -132,12 +134,21 @@ test("c", () => {});
       `test("a", () => {});\ntest("b", () => {});`,
     );
 
-    const homeScreen = createScreen({ screen: 'home', route: '/', title: 'ホーム', cases: [
-      { action: 'a', steps: ['s'], expect: 'e', type: 'normal' },
-      { action: 'b', steps: ['s'], expect: 'e', type: 'error' },
-    ]});
+    const homeScreen = createScreen({
+      screen: 'home',
+      route: '/',
+      title: 'ホーム',
+      cases: [
+        { action: 'a', steps: ['s'], expect: 'e', type: 'normal' },
+        { action: 'b', steps: ['s'], expect: 'e', type: 'error' },
+      ],
+    });
 
-    const result = await checkCoverage([createScreen(), homeScreen], [], path.join(tempDir, 'tests'));
+    const result = await checkCoverage(
+      [createScreen(), homeScreen],
+      [],
+      path.join(tempDir, 'tests'),
+    );
 
     expect(result.hasErrors).toBe(false);
     expect(result.issues).toHaveLength(2);
@@ -254,10 +265,13 @@ describe('collectTestFiles', () => {
 describe('countTestCases', () => {
   it('it() 呼び出しをカウントする', async () => {
     const filePath = path.join(tempDir, 'test.ts');
-    await writeFile(filePath, `
+    await writeFile(
+      filePath,
+      `
   it("a", () => {});
   it("b", () => {});
-`);
+`,
+    );
 
     const count = await countTestCases(filePath);
 
@@ -266,11 +280,14 @@ describe('countTestCases', () => {
 
   it('test() 呼び出しをカウントする', async () => {
     const filePath = path.join(tempDir, 'test.ts');
-    await writeFile(filePath, `
+    await writeFile(
+      filePath,
+      `
   test("a", () => {});
   test("b", () => {});
   test("c", () => {});
-`);
+`,
+    );
 
     const count = await countTestCases(filePath);
 
@@ -279,13 +296,16 @@ describe('countTestCases', () => {
 
   it('it.todo() と it.skip() もカウントに含める', async () => {
     const filePath = path.join(tempDir, 'test.ts');
-    await writeFile(filePath, `
+    await writeFile(
+      filePath,
+      `
   it("a", () => {});
   it.todo("b");
   it.skip("c", () => {});
   test.todo("d");
   test.skip("e", () => {});
-`);
+`,
+    );
 
     const count = await countTestCases(filePath);
 
@@ -294,11 +314,14 @@ describe('countTestCases', () => {
 
   it('コメント内の it() をカウントしない', async () => {
     const filePath = path.join(tempDir, 'test.ts');
-    await writeFile(filePath, `
+    await writeFile(
+      filePath,
+      `
   // it("commented", () => {});
   /* it("block commented", () => {}); */
   it("real", () => {});
-`);
+`,
+    );
 
     const count = await countTestCases(filePath);
 

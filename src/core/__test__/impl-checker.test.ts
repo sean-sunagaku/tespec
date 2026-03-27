@@ -1,15 +1,18 @@
-import { writeFile, mkdir, rm } from 'node:fs/promises';
+import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
-import { describe, expect, it, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { checkImplemented, countUnimplemented } from '../impl-checker.js';
 
 let tempDir: string;
 
 beforeEach(async () => {
-  tempDir = path.join(tmpdir(), `tespec-impl-test-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+  tempDir = path.join(
+    tmpdir(),
+    `tespec-impl-test-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+  );
   await mkdir(tempDir, { recursive: true });
 });
 
@@ -148,10 +151,13 @@ test.skip("b", () => {});
 describe('countUnimplemented', () => {
   it('TODO マーカーなしのファイルを解析すると、total がテスト数と一致し unimplemented が 0', async () => {
     const filePath = path.join(tempDir, 'test.ts');
-    await writeFile(filePath, `
+    await writeFile(
+      filePath,
+      `
 test("a", () => { expect(1).toBe(1); });
 test("b", () => { expect(2).toBe(2); });
-`);
+`,
+    );
 
     const result = await countUnimplemented(filePath);
 
@@ -161,7 +167,9 @@ test("b", () => { expect(2).toBe(2); });
 
   it('TODO implement コメントが含まれるファイルを解析すると、TODO マーカーの数だけ unimplemented がカウントされる', async () => {
     const filePath = path.join(tempDir, 'test.ts');
-    await writeFile(filePath, `
+    await writeFile(
+      filePath,
+      `
 test("a", () => { expect(1).toBe(1); });
 test("b", () => {
   // TODO: implement
@@ -169,7 +177,8 @@ test("b", () => {
 test("c", () => {
   // TODO: implement
 });
-`);
+`,
+    );
 
     const result = await countUnimplemented(filePath);
 
@@ -179,11 +188,14 @@ test("c", () => {
 
   it('it.todo() と通常の it() が混在するファイルを解析すると、total が合計で unimplemented が it.todo() の数', async () => {
     const filePath = path.join(tempDir, 'test.ts');
-    await writeFile(filePath, `
+    await writeFile(
+      filePath,
+      `
 it("a", () => { expect(1).toBe(1); });
 it("b", () => { expect(2).toBe(2); });
 it.todo("c");
-`);
+`,
+    );
 
     const result = await countUnimplemented(filePath);
 

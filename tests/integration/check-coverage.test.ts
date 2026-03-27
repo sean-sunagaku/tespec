@@ -19,8 +19,10 @@ function testsDir(name: string): string {
 describe.sequential('check-coverage command', () => {
   it('returns exit 0 and prints OK lines when all screens are covered', async () => {
     const result = await runCommand(CheckCoverage, [
-      '--config', configPath('check-coverage-ok'),
-      '--tests-dir', testsDir('check-coverage-ok'),
+      '--config',
+      configPath('check-coverage-ok'),
+      '--tests-dir',
+      testsDir('check-coverage-ok'),
     ]);
 
     expect(result.code).toBe(0);
@@ -31,8 +33,10 @@ describe.sequential('check-coverage command', () => {
 
   it('returns exit 1 and prints ERROR when test file is missing', async () => {
     const result = await runCommand(CheckCoverage, [
-      '--config', configPath('check-coverage-missing'),
-      '--tests-dir', testsDir('check-coverage-missing'),
+      '--config',
+      configPath('check-coverage-missing'),
+      '--tests-dir',
+      testsDir('check-coverage-missing'),
     ]);
 
     expect(result.code).toBe(1);
@@ -42,8 +46,10 @@ describe.sequential('check-coverage command', () => {
 
   it('returns exit 0 and prints WARN when case count mismatches', async () => {
     const result = await runCommand(CheckCoverage, [
-      '--config', configPath('check-coverage-mismatch'),
-      '--tests-dir', testsDir('check-coverage-mismatch'),
+      '--config',
+      configPath('check-coverage-mismatch'),
+      '--tests-dir',
+      testsDir('check-coverage-mismatch'),
     ]);
 
     expect(result.code).toBe(0);
@@ -53,8 +59,10 @@ describe.sequential('check-coverage command', () => {
 
   it('returns exit 1 when config.yaml does not exist', async () => {
     const result = await runCommand(CheckCoverage, [
-      '--config', resolve(fixturesRoot, 'nonexistent', 'config.yaml'),
-      '--tests-dir', testsDir('check-coverage-ok'),
+      '--config',
+      resolve(fixturesRoot, 'nonexistent', 'config.yaml'),
+      '--tests-dir',
+      testsDir('check-coverage-ok'),
     ]);
 
     expect(result.code).toBe(1);
@@ -63,8 +71,10 @@ describe.sequential('check-coverage command', () => {
 
   it('returns exit 1 when YAML has syntax errors', async () => {
     const result = await runCommand(CheckCoverage, [
-      '--config', configPath('check-coverage-invalid-yaml'),
-      '--tests-dir', testsDir('check-coverage-ok'),
+      '--config',
+      configPath('check-coverage-invalid-yaml'),
+      '--tests-dir',
+      testsDir('check-coverage-ok'),
     ]);
 
     expect(result.code).toBe(1);
@@ -73,8 +83,10 @@ describe.sequential('check-coverage command', () => {
 
   it('returns exit 1 when screen YAML has schema errors', async () => {
     const result = await runCommand(CheckCoverage, [
-      '--config', configPath('check-coverage-invalid-schema'),
-      '--tests-dir', testsDir('check-coverage-ok'),
+      '--config',
+      configPath('check-coverage-invalid-schema'),
+      '--tests-dir',
+      testsDir('check-coverage-ok'),
     ]);
 
     expect(result.code).toBe(1);
@@ -83,8 +95,10 @@ describe.sequential('check-coverage command', () => {
 
   it('returns exit 1 when tests-dir does not exist', async () => {
     const result = await runCommand(CheckCoverage, [
-      '--config', configPath('check-coverage-ok'),
-      '--tests-dir', resolve(fixturesRoot, 'check-coverage-ok', 'nonexistent'),
+      '--config',
+      configPath('check-coverage-ok'),
+      '--tests-dir',
+      resolve(fixturesRoot, 'check-coverage-ok', 'nonexistent'),
     ]);
 
     expect(result.code).toBe(1);
