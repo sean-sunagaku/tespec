@@ -1,7 +1,7 @@
-import { mkdir, writeFile, rm } from 'node:fs/promises';
+import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { describe, it, expect, afterEach } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import { watchProject } from '../../src/core/viewer/watcher.js';
 
@@ -30,10 +30,9 @@ describe('Viewer Watcher', () => {
     const dir = await createTempYamlDir();
     let updateCount = 0;
 
-    const handle = watchProject(
-      { directories: [dir], debounceMs: 100 },
-      () => { updateCount++; },
-    );
+    const handle = watchProject({ directories: [dir], debounceMs: 100 }, () => {
+      updateCount++;
+    });
 
     // chokidar の初期化を待つ
     await new Promise((r) => setTimeout(r, 500));
@@ -56,18 +55,14 @@ describe('Viewer Watcher', () => {
     const dir = await createTempYamlDir();
     let updateCount = 0;
 
-    const handle = watchProject(
-      { directories: [dir], debounceMs: 100 },
-      () => { updateCount++; },
-    );
+    const handle = watchProject({ directories: [dir], debounceMs: 100 }, () => {
+      updateCount++;
+    });
 
     await new Promise((r) => setTimeout(r, 500));
 
     // 新しいファイルを追加
-    await writeFile(
-      join(dir, 'home.yaml'),
-      'screen: home\nroute: /\ntitle: Home\ncases: []\n',
-    );
+    await writeFile(join(dir, 'home.yaml'), 'screen: home\nroute: /\ntitle: Home\ncases: []\n');
 
     await new Promise((r) => setTimeout(r, 800));
 
@@ -80,10 +75,9 @@ describe('Viewer Watcher', () => {
     const dir = await createTempYamlDir();
     let updateCount = 0;
 
-    const handle = watchProject(
-      { directories: [dir], debounceMs: 100 },
-      () => { updateCount++; },
-    );
+    const handle = watchProject({ directories: [dir], debounceMs: 100 }, () => {
+      updateCount++;
+    });
 
     await new Promise((r) => setTimeout(r, 1000));
     await handle.stop();

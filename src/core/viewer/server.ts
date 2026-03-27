@@ -1,12 +1,12 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import type { ServerType } from '@hono/node-server';
+import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { streamSSE } from 'hono/streaming';
-import { serve } from '@hono/node-server';
-import type { ServerType } from '@hono/node-server';
-import { renderHtml } from './template.js';
 import type { ParsedProject } from '../parser.js';
+import { renderHtml } from './template.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

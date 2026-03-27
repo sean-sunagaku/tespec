@@ -1,8 +1,9 @@
+import type { KeyboardEvent } from 'preact/compat';
 import { useState } from 'preact/hooks';
 import type { ParsedProject } from '../../parser.js';
 import { ScreenDetail } from './ScreenDetail.js';
-import { UnitDetail } from './UnitDetail.js';
 import { SetupDetail } from './SetupDetail.js';
+import { UnitDetail } from './UnitDetail.js';
 
 type View =
   | { type: 'dashboard' }
@@ -12,6 +13,17 @@ type View =
 
 interface AppProps {
   data: ParsedProject;
+}
+
+function clickable(handler: () => void) {
+  return {
+    role: 'button' as const,
+    tabIndex: 0,
+    onClick: handler,
+    onKeyDown: (e: KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') handler();
+    },
+  };
 }
 
 export function App({ data }: AppProps) {
@@ -35,7 +47,6 @@ export function App({ data }: AppProps) {
 
   return (
     <div data-testid="app-root">
-      {/* Sidebar */}
       <nav>
         {screens.length > 0 && (
           <div>
@@ -44,7 +55,7 @@ export function App({ data }: AppProps) {
               <div
                 key={s.screen}
                 data-testid={`sidebar-screen-${s.screen}`}
-                onClick={() => navigate('screen', s.screen)}
+                {...clickable(() => navigate('screen', s.screen))}
               >
                 {s.screen}
               </div>
@@ -59,7 +70,7 @@ export function App({ data }: AppProps) {
               <div
                 key={u.unit}
                 data-testid={`sidebar-unit-${u.unit}`}
-                onClick={() => navigate('unit', u.unit)}
+                {...clickable(() => navigate('unit', u.unit))}
               >
                 {u.unit}
               </div>
@@ -74,7 +85,7 @@ export function App({ data }: AppProps) {
               <div
                 key={s.setup}
                 data-testid={`sidebar-setup-${s.setup.replace(/_/g, '-')}`}
-                onClick={() => navigate('setup', s.setup)}
+                {...clickable(() => navigate('setup', s.setup))}
               >
                 {s.setup}
               </div>
@@ -83,30 +94,32 @@ export function App({ data }: AppProps) {
         )}
       </nav>
 
-      {/* Main */}
       <main>
         {isEmpty && <div data-testid="empty-state">No specs defined.</div>}
 
-        {view.type === 'screen' && (() => {
-          const s = screens.find((sc) => sc.screen === view.id);
-          return s ? <ScreenDetail screen={s} setups={setups} onNavigate={navigate} /> : null;
-        })()}
+        {view.type === 'screen' &&
+          (() => {
+            const s = screens.find((sc) => sc.screen === view.id);
+            return s ? <ScreenDetail screen={s} setups={setups} onNavigate={navigate} /> : null;
+          })()}
 
-        {view.type === 'unit' && (() => {
-          const u = units.find((un) => un.unit === view.id);
-          return u ? <UnitDetail unit={u} /> : null;
-        })()}
+        {view.type === 'unit' &&
+          (() => {
+            const u = units.find((un) => un.unit === view.id);
+            return u ? <UnitDetail unit={u} /> : null;
+          })()}
 
-        {view.type === 'setup' && (() => {
-          const s = setups.find((st) => st.setup === view.id);
-          return s ? (
-            <SetupDetail
-              setup={s}
-              referencingScreens={getReferencingScreens(s.setup)}
-              onNavigate={navigate}
-            />
-          ) : null;
-        })()}
+        {view.type === 'setup' &&
+          (() => {
+            const s = setups.find((st) => st.setup === view.id);
+            return s ? (
+              <SetupDetail
+                setup={s}
+                referencingScreens={getReferencingScreens(s.setup)}
+                onNavigate={navigate}
+              />
+            ) : null;
+          })()}
       </main>
     </div>
   );

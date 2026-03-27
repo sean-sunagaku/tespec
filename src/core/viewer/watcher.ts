@@ -9,10 +9,7 @@ export interface WatchHandle {
   stop(): Promise<void>;
 }
 
-export function watchProject(
-  options: WatcherOptions,
-  onUpdate: () => void,
-): WatchHandle {
+export function watchProject(options: WatcherOptions, onUpdate: () => void): WatchHandle {
   const { directories, debounceMs = 300 } = options;
   let timer: ReturnType<typeof setTimeout> | undefined;
 

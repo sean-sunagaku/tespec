@@ -20,7 +20,12 @@ const screens: Screen[] = [
     route: '/login',
     title: 'ログイン画面',
     cases: [
-      { action: '画面を開く', steps: ['/login にアクセスする'], expect: 'フォームが表示される', type: 'normal' },
+      {
+        action: '画面を開く',
+        steps: ['/login にアクセスする'],
+        expect: 'フォームが表示される',
+        type: 'normal',
+      },
       {
         action: 'ログインする',
         steps: ['認証情報を入力', '送信ボタンをクリック'],

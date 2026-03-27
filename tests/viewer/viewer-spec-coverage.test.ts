@@ -1,15 +1,13 @@
 import { readdir, readFile } from 'node:fs/promises';
-import { resolve, basename } from 'node:path';
-import { describe, it, expect } from 'vitest';
+import { basename, resolve } from 'node:path';
+import { describe, expect, it } from 'vitest';
 import { parseDocument } from 'yaml';
 
 const specsDir = resolve(__dirname, '../../docs/tespec/screens/viewer');
 const testsDir = resolve(__dirname);
 
 function findTestFile(testFiles: string[], screenId: string): string | undefined {
-  return testFiles.find(
-    (f) => f === `${screenId}.test.tsx` || f === `${screenId}.test.ts`,
-  );
+  return testFiles.find((f) => f === `${screenId}.test.tsx` || f === `${screenId}.test.ts`);
 }
 
 function stripTestExt(filename: string): string {

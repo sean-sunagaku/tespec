@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-import { render, screen, fireEvent, cleanup } from '@testing-library/preact';
-import { afterEach, describe, it, expect } from 'vitest';
+import { cleanup, fireEvent, render, screen } from '@testing-library/preact';
+import { afterEach, describe, expect, it } from 'vitest';
 import '@testing-library/jest-dom';
 
 import { App } from '../../src/core/viewer/components/App';
