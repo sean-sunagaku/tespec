@@ -1,0 +1,20 @@
+screen: home
+route: /
+title: ホーム画面
+cases:
+  - action: 画面を開く
+    steps:
+      - / にアクセスする
+    expect: 一覧が表示される
+    type: normal
+  - action: オフラインで開く
+    steps:
+      - ネットワークを切断する
+      - / にアクセスする
+    expect: エラーメッセージが表示される
+    type: error
+  - action: 0件で開く
+    steps:
+      - / にアクセスする
+    expect: 空状態メッセージが表示される
+    type: boundary

@@ -1,0 +1,41 @@
+unit: generator-registry
+title: ジェネレーターレジストリ
+methods:
+  - method: getScreenGenerator
+    cases:
+      - action: playwright ターゲットでジェネレーターを取得する
+        expect: Playwright ScreenGenerator が返る
+        type: normal
+      - action: vitest ターゲットでジェネレーターを取得する
+        expect: Vitest ScreenGenerator が返る
+        type: normal
+      - action: xctest ターゲットでジェネレーターを取得する
+        expect: XCTest ScreenGenerator が返る
+        type: normal
+
+  - method: getUnitGenerator
+    cases:
+      - action: vitest ターゲットでジェネレーターを取得する
+        expect: Vitest UnitGenerator が返る
+        type: normal
+      - action: xctest ターゲットでジェネレーターを取得する
+        expect: XCTest UnitGenerator が返る
+        type: normal
+
+  - method: isScreenTarget
+    cases:
+      - action: 有効なターゲット名を判定する
+        expect: true が返る
+        type: normal
+      - action: 無効なターゲット名を判定する
+        expect: false が返る
+        type: error
+
+  - method: isUnitTarget
+    cases:
+      - action: 有効なターゲット名を判定する
+        expect: true が返る
+        type: normal
+      - action: 無効なターゲット名を判定する
+        expect: false が返る
+        type: error

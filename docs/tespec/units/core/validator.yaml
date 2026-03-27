@@ -1,0 +1,42 @@
+unit: validator
+title: Screen バリデーター
+methods:
+  - method: validate
+    cases:
+      - action: 有効な screens と setups でバリデーションする
+        expect:
+          - hasErrors が false
+          - issues が空
+        type: normal
+      - action: 重複する screen ID を検出する
+        expect:
+          - hasErrors が true
+          - 重複エラーが報告される
+        type: error
+      - action: 存在しない setup ID を given で参照する
+        expect:
+          - hasErrors が true
+          - setup 参照エラーが報告される
+        type: error
+      - action: 存在しない screen ID を navigates_to で参照する
+        expect:
+          - hasErrors が true
+          - screen 参照エラーが報告される
+        type: error
+      - action: steps 内の use:setup_id が存在しない setup を参照する
+        expect: hasErrors が true
+        type: error
+      - action: cases が空の screen を検出する
+        expect: warning で cases が空と報告される
+        type: boundary
+      - action: type error のケースが 0 件の screen を検出する
+        expect: warning で異常系が 0 件と報告される
+        type: boundary
+      - action: type boundary のケースが 0 件の screen を検出する
+        expect: warning で境界値が 0 件と報告される
+        type: boundary
+      - action: screens が空配列の場合
+        expect:
+          - hasErrors が false
+          - issues が空
+        type: boundary

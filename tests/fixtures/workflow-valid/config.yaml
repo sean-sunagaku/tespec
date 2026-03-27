@@ -1,0 +1,5 @@
+version: 1
+project: tespec-workflow-valid
+screens_dir: ./screens
+setups_dir: ./setups
+workflows_dir: ./workflows

@@ -1,0 +1,92 @@
+unit: schema
+title: Zod スキーマバリデーション
+methods:
+  - method: CaseSchema
+    cases:
+      - action: 必須フィールドのみでパースする
+        expect:
+          - action が含まれる
+          - expect が含まれる
+          - steps が含まれる
+          - type がデフォルト値 normal で返る
+        type: normal
+      - action: 全フィールド指定でパースする
+        expect:
+          - given が含まれる
+          - target が含まれる
+          - type が含まれる
+          - not_expect が含まれる
+          - navigates_to が含まれる
+        type: normal
+      - action: action が未指定の場合
+        expect: バリデーションエラーが発生する
+        type: error
+      - action: expect が未指定の場合
+        expect: バリデーションエラーが発生する
+        type: error
+      - action: steps が空配列の場合
+        expect: バリデーションエラーが発生する
+        type: error
+      - action: type に不正な値を指定する
+        expect: バリデーションエラーが発生する
+        type: error
+      - action: type 未指定の場合
+        expect: デフォルト値 normal が適用される
+        type: boundary
+
+  - method: ScreenSchema
+    cases:
+      - action: 有効な screen をパースする
+        expect:
+          - screen が含まれる
+          - route が含まれる
+          - title が含まれる
+          - cases が含まれる
+        type: normal
+      - action: screen が未指定の場合
+        expect: バリデーションエラーが発生する
+        type: error
+      - action: cases が空配列の場合
+        expect: パースは成功する
+        type: boundary
+
+  - method: SetupSchema
+    cases:
+      - action: 有効な setup をパースする
+        expect:
+          - setup が含まれる
+          - title が含まれる
+          - steps が含まれる
+        type: normal
+      - action: setup が未指定の場合
+        expect: バリデーションエラーが発生する
+        type: error
+
+  - method: UnitSpecSchema
+    cases:
+      - action: 有効な unit spec をパースする
+        expect:
+          - unit が含まれる
+          - title が含まれる
+          - methods が含まれる
+        type: normal
+      - action: methods 内の cases にデフォルト type が適用される
+        expect: type が normal になる
+        type: boundary
+
+  - method: ConfigSchema
+    cases:
+      - action: 全フィールド指定でパースする
+        expect:
+          - version が含まれる
+          - project が含まれる
+          - screens_dir が含まれる
+          - setups_dir が含まれる
+          - units_dir が含まれる
+        type: normal
+      - action: screens_dir 未指定の場合
+        expect: デフォルト値 ./screens が適用される
+        type: boundary
+      - action: units_dir 未指定の場合
+        expect: units_dir が undefined で返る
+        type: boundary

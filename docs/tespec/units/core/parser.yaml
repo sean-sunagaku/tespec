@@ -1,0 +1,45 @@
+unit: parser
+title: YAML パーサー
+methods:
+  - method: parseProject
+    cases:
+      - action: 有効な config で全 spec をパースする
+        expect:
+          - screens が ParsedProject に含まれる
+          - setups が ParsedProject に含まれる
+          - units が ParsedProject に含まれる
+        type: normal
+      - action: units_dir 未指定でパースする
+        expect: units が空配列で返る
+        type: normal
+      - action: 存在しないディレクトリを指定する
+        expect: エラーが errors に含まれる
+        type: error
+      - action: 不正な YAML 構文のファイルを含むプロジェクトをパースする
+        expect:
+          - パースエラーが報告される
+          - エラーにファイルパスが含まれる
+        type: error
+      - action: Zod バリデーションに失敗するファイルをパースする
+        expect:
+          - バリデーションエラーが報告される
+          - エラーにフィールドパスが含まれる
+        type: error
+      - action: screens が 0 件のプロジェクトをパースする
+        expect: screens が空配列で返る
+        type: boundary
+
+  - method: parseYamlFile
+    cases:
+      - action: 有効な screen YAML をパースする
+        expect: data に Screen オブジェクトが含まれる
+        type: normal
+      - action: 有効な setup YAML をパースする
+        expect: data に Setup オブジェクトが含まれる
+        type: normal
+      - action: 存在しないファイルパスを指定する
+        expect: errors にファイル未検出メッセージが含まれる
+        type: error
+      - action: 空ファイルをパースする
+        expect: errors にバリデーションエラーが含まれる
+        type: boundary

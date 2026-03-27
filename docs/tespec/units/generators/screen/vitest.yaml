@@ -1,0 +1,46 @@
+unit: generator-screen-vitest
+title: Vitest Screen テストジェネレーター
+methods:
+  - method: generateTestFile
+    cases:
+      - action: 正常系のみの screen からテストを生成する
+        expect: describe 内に正常系テストが含まれる
+        type: normal
+      - action: 異常系ケースを含む screen からテストを生成する
+        expect: 異常系用のネストされた describe が含まれる
+        type: normal
+      - action: 境界値ケースを含む screen からテストを生成する
+        expect: 境界値用のネストされた describe が含まれる
+        type: normal
+      - action: given 付きケースのテスト名を生成する
+        expect: テスト名に given の値がブラケット付きプレフィックスとして含まれる
+        type: normal
+      - action: navigates_to 付きケースからテストを生成する
+        expect: コメントに navigates_to の値が含まれる
+        type: normal
+      - action: not_expect 付きケースからテストを生成する
+        expect: コメントに not_expect の値が含まれる
+        type: normal
+      - action: steps 内の use:setup_id を setup タイトルに解決する
+        expect: コメントに setup のタイトルが含まれる
+        type: normal
+      - action: given が配列の場合
+        expect: テスト名にカンマ区切りで given 値が含まれる
+        type: normal
+      - action: vitest の import 文が含まれる
+        expect: describe, it, expect の import が生成される
+        type: normal
+      - action: expect が配列の場合
+        expect:
+          - 先頭の期待値がテスト名に使われる
+          - TODO コメントが含まれる
+        type: boundary
+      - action: cases が空の type グループの場合
+        expect: そのグループの describe が出力されない
+        type: boundary
+
+  - method: fileNameFor
+    cases:
+      - action: screen ID からファイル名を生成する
+        expect: screenId.test.ts が返る
+        type: normal

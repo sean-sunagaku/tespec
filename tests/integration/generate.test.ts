@@ -119,6 +119,55 @@ describe.sequential('generate command', () => {
     ]);
   });
 
+  it('prints workflow skeletons on dry-run when workflows_dir is configured', async () => {
+    const result = await runCommand(Generate, [
+      '--config',
+      configPath('workflow-valid'),
+      '--dry-run',
+      '--out-dir',
+      'tests/generated',
+    ]);
+
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain('// tests/generated/user_registration.spec.ts');
+    expect(result.stdout).toContain('test("新規ユーザー登録フロー"');
+    expect(result.stdout).toContain('Step 1: login');
+    expect(result.stdout).toContain('Step 2: home');
+    expect(result.stdout).toContain('TODO: implement');
+    expect(result.stdout).toContain('files generated');
+  });
+
+  it('filters generation by workflow ID', async () => {
+    const result = await runCommand(Generate, [
+      '--config',
+      configPath('workflow-valid'),
+      '--dry-run',
+      '--out-dir',
+      'tests/generated',
+      '--workflow',
+      'user_registration',
+    ]);
+
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain('// tests/generated/user_registration.spec.ts');
+    expect(result.stdout).not.toContain('// tests/generated/login.spec.ts');
+    expect(result.stdout).not.toContain('// tests/generated/home.spec.ts');
+  });
+
+  it('returns exit 1 when workflow validation errors exist', async () => {
+    const result = await runCommand(Generate, [
+      '--config',
+      configPath('workflow-invalid'),
+      '--dry-run',
+      '--out-dir',
+      'tests/generated',
+    ]);
+
+    expect(result.code).toBe(1);
+    expect(result.stderr).toContain('ERROR:');
+    expect(result.stderr).toContain('が見つからない');
+  });
+
   it('filters generation by unit ID', async () => {
     const result = await runCommand(Generate, [
       '--config',

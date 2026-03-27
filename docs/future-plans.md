@@ -64,7 +64,41 @@ npx tespec next --format prompt
 
 ---
 
-## 4. GitHub Actions 連携
+## 4. テストカバレッジ検証コマンド
+
+YAML 仕様に対応するテストが全て存在するかを検証する。
+
+```bash
+npx tespec coverage [--config <path>] [--test-dir <path>]
+```
+
+```
+Coverage Report:
+──────────────────────────────────────
+screens/home.yaml        ✓ tests/home.spec.ts
+screens/login.yaml       ✓ tests/login.spec.ts
+workflows/checkout.yaml  ✗ テストファイルが見つかりません
+units/parser.yaml        ✓ tests/parser.test.ts
+──────────────────────────────────────
+Coverage: 3/4 (75%)
+
+Missing:
+  workflows/checkout.yaml → tests/checkout.spec.ts
+```
+
+チェック項目:
+
+| チェック | 説明 |
+|---------|------|
+| 生成済みファイルの存在 | YAML に対応するテストファイルが test-dir に存在するか |
+| TODO 残存 | 生成されたスケルトンに `// TODO: implement` が残っていないか |
+| ケース数一致 | YAML の case 数とテストファイル内の test 数が一致するか |
+
+exit code: 未カバーの YAML がある場合は 1
+
+---
+
+## 5. GitHub Actions 連携
 
 PR に「画面ごとのテスト実装状況」をコメントする。
 

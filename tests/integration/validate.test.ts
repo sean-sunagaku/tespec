@@ -127,6 +127,32 @@ describe.sequential('validate command', () => {
     expect(result.stderr).toContain('title:');
   });
 
+  it('returns exit 0 and prints OK lines for a valid project with workflows', async () => {
+    const result = await runCommand(Validate, ['--config', configPath('workflow-valid')]);
+
+    expect(result.code).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(result.stdout).toContain('OK:');
+    expect(result.stdout).toContain('workflows/user_registration.yaml');
+  });
+
+  it('returns exit 1 and prints ERROR for workflow with invalid screen reference', async () => {
+    const result = await runCommand(Validate, ['--config', configPath('workflow-invalid')]);
+
+    expect(result.code).toBe(1);
+    expect(result.stderr).toContain('ERROR:');
+    expect(result.stderr).toContain('が見つからない');
+  });
+
+  it('returns exit 0 for a valid workflow YAML via --file', async () => {
+    const filePath = fixturePath('workflow-valid', 'workflows', 'user_registration.yaml');
+    const result = await runCommand(Validate, ['--file', filePath]);
+
+    expect(result.code).toBe(0);
+    expect(result.stderr).toBe('');
+    expect(result.stdout).toContain('OK:');
+  });
+
   it('returns exit 1 when --file and --config are passed together', async () => {
     const result = await runCommand(Validate, [
       '--config',

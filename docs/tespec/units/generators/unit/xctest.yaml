@@ -1,0 +1,62 @@
+unit: generator-unit-xctest
+title: XCTest Unit テストジェネレーター
+methods:
+  - method: generateSwiftUnitTestFile
+    cases:
+      - action: 正常系のみの unit spec からテストを生成する
+        expect: XCTestCase クラス内に正常系テストメソッドが含まれる
+        type: normal
+      - action: 異常系ケースを含む method からテストを生成する
+        expect: 異常系テストメソッドが含まれる
+        type: normal
+      - action: 境界値ケースを含む method からテストを生成する
+        expect: 境界値テストメソッドが含まれる
+        type: normal
+      - action: 複数 method を持つ unit spec からテストを生成する
+        expect: method ごとに MARK コメント付きセクションが含まれる
+        type: normal
+      - action: import XCTest が含まれる
+        expect: ファイル先頭に import XCTest が生成される
+        type: normal
+      - action: expect が配列の場合
+        expect: 先頭の期待値がメソッド名に使われる
+        type: boundary
+      - action: ケースの type 順が normal, error, boundary の順になる
+        expect: 正常系, 異常系, 境界値の順でメソッドが出力される
+        type: normal
+
+  - method: fileNameFor
+    cases:
+      - action: unit ID からファイル名を生成する
+        expect: PascalCase に変換された UnitIdTests.swift が返る
+        type: normal
+      - action: ハイフン区切りの unit ID からファイル名を生成する
+        expect: ハイフンで分割して PascalCase に変換される
+        type: normal
+      - action: アンダースコア区切りの unit ID からファイル名を生成する
+        expect: アンダースコアで分割して PascalCase に変換される
+        type: normal
+
+  - method: buildFuncName
+    cases:
+      - action: method 名とケースからメソッド名を生成する
+        expect: test_method_action_expect 形式の名前が返る
+        type: normal
+      - action: 空白を含む action からメソッド名を生成する
+        expect: 空白がアンダースコアに置換される
+        type: normal
+      - action: 特殊記号を含む expect からメソッド名を生成する
+        expect: Unicode 文字とアンダースコア以外が除去される
+        type: error
+
+  - method: sanitize
+    cases:
+      - action: 空白を含む文字列をサニタイズする
+        expect: 空白がアンダースコアに置換される
+        type: normal
+      - action: 特殊記号を含む文字列をサニタイズする
+        expect: Unicode 文字とアンダースコア以外が除去される
+        type: normal
+      - action: 日本語を含む文字列をサニタイズする
+        expect: 日本語文字が保持される
+        type: boundary

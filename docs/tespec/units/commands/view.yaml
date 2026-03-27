@@ -1,0 +1,46 @@
+unit: command-view
+title: view コマンド
+methods:
+  - method: run
+    cases:
+      - action: 有効な config でビューワーサーバーを起動する
+        expect:
+          - サーバーが起動する
+          - URL が表示される
+          - ファイルウォッチャーが起動する
+        type: normal
+      - action: --port フラグでポートを指定する
+        expect: 指定ポートでサーバーが起動する
+        type: normal
+      - action: config のパースに失敗する
+        expect: パースエラーが表示されて終了する
+        type: error
+      - action: ファイル変更を検出してデータを更新する
+        expect:
+          - parseProject が再実行される
+          - サーバーのデータが更新される
+        type: normal
+      - action: ファイル変更時にパースエラーが発生する
+        expect: 警告が表示されるがサーバーは停止しない
+        type: error
+      - action: SIGINT シグナルを受信する
+        expect:
+          - ウォッチャーが停止する
+          - サーバーが停止する
+          - プロセスが終了する
+        type: normal
+      - action: SIGTERM シグナルを受信する
+        expect:
+          - ウォッチャーが停止する
+          - サーバーが停止する
+          - プロセスが終了する
+        type: normal
+
+  - method: resolveConfigPath
+    cases:
+      - action: パスを指定してコンフィグパスを解決する
+        expect: 指定パスの絶対パスが返る
+        type: normal
+      - action: パス未指定でコンフィグパスを解決する
+        expect: デフォルトパス ./docs/tespec/config.yaml の絶対パスが返る
+        type: boundary

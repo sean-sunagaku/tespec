@@ -1,0 +1,7 @@
+workflow: user_registration
+title: 新規ユーザー登録フロー
+steps:
+  - screen: login
+    action: 新規登録リンクをタップ
+  - screen: home
+    expect: ホーム画面が表示される

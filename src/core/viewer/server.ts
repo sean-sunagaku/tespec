@@ -50,6 +50,7 @@ export async function startServer(
       screens: currentData.screens,
       setups: currentData.setups,
       units: currentData.units,
+      workflows: currentData.workflows,
     });
   });
 

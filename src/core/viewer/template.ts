@@ -6,6 +6,7 @@ export function renderHtml(project: ParsedProject): string {
     screens: project.screens,
     setups: project.setups,
     units: project.units,
+    workflows: project.workflows,
   });
 
   return `<!DOCTYPE html>

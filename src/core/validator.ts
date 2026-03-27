@@ -1,16 +1,7 @@
 import type { Screen, Setup } from './schema.js';
+import type { ValidationIssue, ValidationResult } from './validation-types.js';
 
-export interface ValidationIssue {
-  level: 'error' | 'warning';
-  file: string;
-  field: string;
-  message: string;
-}
-
-export interface ValidationResult {
-  issues: ValidationIssue[];
-  hasErrors: boolean;
-}
+export type { ValidationIssue, ValidationResult };
 
 export function validate(screens: Screen[], setups: Setup[]): ValidationResult {
   const issues: ValidationIssue[] = [];

@@ -1,0 +1,49 @@
+screen: viewer-workflow-detail
+route: "/#/workflow/:id"
+title: Viewer Workflow 詳細画面
+cases:
+  - action: ダッシュボードにワークフローが表示される
+    steps:
+      - tespec view でビューアーを開く
+    expect: サイドバーに workflow 一覧が表示される
+    type: normal
+  - action: workflow を選択する
+    steps:
+      - サイドバーの workflow をクリックする
+    expect: workflow の詳細がメインエリアに表示される
+    type: normal
+  - action: workflow のタイトルが表示される
+    steps:
+      - WorkflowDetail コンポーネントを表示する
+    expect: workflow の title が表示される
+    type: normal
+  - action: 全ステップがカード形式で表示される
+    steps:
+      - WorkflowDetail コンポーネントを表示する
+    expect: 全ステップが表示される
+    type: normal
+  - action: ステップの screen ID が表示される
+    steps:
+      - WorkflowDetail コンポーネントを表示する
+    expect: 各ステップに screen ID が表示される
+    type: normal
+  - action: action がある場合に表示される
+    steps:
+      - action 付きステップを含む workflow を表示する
+    expect: action テキストが表示される
+    type: normal
+  - action: expect がある場合に表示される
+    steps:
+      - expect 付きステップを含む workflow を表示する
+    expect: expect テキストが表示される
+    type: normal
+  - action: screen ID をクリックすると画面詳細に遷移する
+    steps:
+      - screen ID リンクをクリックする
+    expect: onNavigate が screen タイプで呼ばれる
+    type: normal
+  - action: action も expect もないステップが表示される
+    steps:
+      - ミニマルなステップを含む workflow を表示する
+    expect: screen ID のみ表示される
+    type: boundary

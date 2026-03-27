@@ -1,0 +1,38 @@
+unit: generator-workflow-playwright
+title: Playwright Workflow テストジェネレーター
+methods:
+  - method: generate
+    cases:
+      - action: action ありのステップからテストを生成する
+        expect:
+          - Step コメントに screen ID が含まれる
+          - Step コメントに action が含まれる
+          - TODO implement が含まれる
+        type: normal
+      - action: expect ありのステップからテストを生成する
+        expect:
+          - Step コメントに screen ID が含まれる
+          - expect コメントが含まれる
+        type: normal
+      - action: action と expect の両方があるステップからテストを生成する
+        expect:
+          - action コメントが含まれる
+          - expect コメントが含まれる
+        type: normal
+      - action: 3 ステップのワークフローからテストを生成する
+        expect:
+          - 単一の test 関数が生成される
+          - test.describe は含まれない
+          - 3 つの Step コメントが含まれる
+        type: normal
+      - action: action も expect もないステップからテストを生成する
+        expect:
+          - Step コメントに screen ID のみ含まれる
+          - ダッシュなしの形式で出力される
+        type: boundary
+
+  - method: fileNameFor
+    cases:
+      - action: workflow ID からファイル名を生成する
+        expect: workflowId.spec.ts が返る
+        type: normal

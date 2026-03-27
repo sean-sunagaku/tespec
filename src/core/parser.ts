@@ -12,6 +12,8 @@ import {
   SetupSchema,
   type UnitSpec,
   UnitSpecSchema,
+  type Workflow,
+  WorkflowSchema,
 } from './schema.js';
 
 export interface ParsedProject {
@@ -19,6 +21,7 @@ export interface ParsedProject {
   screens: Screen[];
   setups: Setup[];
   units: UnitSpec[];
+  workflows: Workflow[];
 }
 
 export interface ParseError {
@@ -52,16 +55,27 @@ export async function parseProject(
   const unitsDir = configResult.data.units_dir
     ? path.resolve(configDir, configResult.data.units_dir)
     : undefined;
+  const workflowsDir = configResult.data.workflows_dir
+    ? path.resolve(configDir, configResult.data.workflows_dir)
+    : undefined;
 
-  const [screensResult, setupsResult, unitsResult] = await Promise.all([
+  const [screensResult, setupsResult, unitsResult, workflowsResult] = await Promise.all([
     parseYamlDirectory(screensDir, ScreenSchema),
     parseYamlDirectory(setupsDir, SetupSchema),
     unitsDir
       ? parseYamlDirectory(unitsDir, UnitSpecSchema)
       : Promise.resolve({ items: [] as UnitSpec[], errors: [] as ParseError[] }),
+    workflowsDir
+      ? parseYamlDirectory(workflowsDir, WorkflowSchema)
+      : Promise.resolve({ items: [] as Workflow[], errors: [] as ParseError[] }),
   ]);
 
-  const errors = [...screensResult.errors, ...setupsResult.errors, ...unitsResult.errors];
+  const errors = [
+    ...screensResult.errors,
+    ...setupsResult.errors,
+    ...unitsResult.errors,
+    ...workflowsResult.errors,
+  ];
   if (errors.length > 0) {
     return { errors };
   }
@@ -72,6 +86,7 @@ export async function parseProject(
       screens: screensResult.items,
       setups: setupsResult.items,
       units: unitsResult.items,
+      workflows: workflowsResult.items,
     },
     errors: [],
   };

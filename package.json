@@ -27,6 +27,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "skill:sync": "tsx scripts/generate-references.ts",
+    "skill:install": "tsx scripts/generate-references.ts && rsync -av skills/tespec-yaml-gen/ ~/.claude/skills/tespec-yaml-gen/",
     "lint": "biome lint ./src ./tests",
     "fmt": "biome format --write ./src ./tests",
     "check": "biome check --write ./src ./tests",
