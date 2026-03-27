@@ -1,0 +1,14 @@
+screen: home
+route: "/"
+title: "ホーム画面"
+cases:
+  - action: "画面を開く"
+    steps:
+      - "/ にアクセスする"
+    expect: "一覧が表示される"
+  - type: error
+    action: "不正入力を送信する"
+    steps:
+      - "/ にアクセスする"
+      - "不正な値を入力する"
+    expect: "エラーが表示される"

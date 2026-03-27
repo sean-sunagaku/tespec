@@ -1,0 +1,72 @@
+unit: coverage-checker
+title: テストカバレッジチェッカー
+methods:
+  - method: checkCoverage
+    cases:
+      - action: 全 screen に対応するテストファイルが存在する
+        expect: 全エントリが ok で hasErrors が false
+        type: normal
+      - action: 全 unit に対応するテストファイルが存在する
+        expect: unit エントリも ok で hasErrors が false
+        type: normal
+      - action: screen の case 数とテストファイル内の it()/test() 数が一致する
+        expect: countMismatch が false
+        type: normal
+      - action: .spec.ts と .test.ts の両方を検出できる
+        expect: ファイル名 stem で YAML ID とマッチする
+        type: normal
+      - action: 対応するテストファイルが存在しない screen がある
+        expect:
+          - level が error の issue が含まれる
+          - hasErrors が true
+        type: error
+      - action: テストファイルの it()/test() 数が YAML case 数と一致しない
+        expect:
+          - level が warn の issue が含まれる
+          - 期待数と実際数がメッセージに含まれる
+        type: error
+      - action: テストディレクトリが存在しない
+        expect: hasErrors が true でエラーメッセージが返る
+        type: error
+      - action: screen が 0 件のプロジェクト
+        expect: issues が空配列で hasErrors が false
+        type: boundary
+      - action: テストディレクトリが空
+        expect: 全 screen が missing 扱い
+        type: boundary
+
+  - method: collectTestFiles
+    cases:
+      - action: テストディレクトリ内の .test.ts ファイルを収集する
+        expect: .test.ts ファイルのパスが Map に含まれる
+        type: normal
+      - action: テストディレクトリ内の .spec.ts ファイルを収集する
+        expect: .spec.ts ファイルのパスが Map に含まれる
+        type: normal
+      - action: Tests.swift パターンのファイルを収集する
+        expect: Swift テストファイルのパスが Map に含まれる
+        type: normal
+      - action: テスト以外のファイルを除外する
+        expect: .ts や .js 等の非テストファイルは含まれない
+        type: normal
+      - action: 空のディレクトリを走査する
+        expect: 空の Map が返る
+        type: boundary
+
+  - method: countTestCases
+    cases:
+      - action: it() 呼び出しをカウントする
+        expect: it() の数が正しく返る
+        type: normal
+      - action: test() 呼び出しをカウントする
+        expect: test() の数が正しく返る
+        type: normal
+      - action: it.todo() と it.skip() もカウントに含める
+        expect: todo/skip を含む総テスト数が返る
+        type: normal
+      - action: コメント内の it() をカウントしない
+        expect: コメント内のパターンは無視される
+        type: boundary
+      - action: 空のファイル
+        expect: 0 が返る
+        type: boundary

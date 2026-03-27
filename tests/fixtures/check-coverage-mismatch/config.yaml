@@ -1,0 +1,4 @@
+version: 1
+project: "check-coverage-mismatch"
+screens_dir: "./screens"
+setups_dir: "./setups"

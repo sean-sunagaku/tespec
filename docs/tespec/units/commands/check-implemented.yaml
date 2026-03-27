@@ -1,0 +1,30 @@
+unit: check-implemented-command
+title: check-implemented コマンド統合テスト
+methods:
+  - method: run
+    cases:
+      - action: 全テストが実装済みのディレクトリでチェックする
+        expect:
+          - exit code が 0
+          - OK 行が出力される
+        type: normal
+      - action: TODO マーカーがあるファイルをチェックする
+        expect:
+          - exit code が 1
+          - WARN 行が出力される
+        type: normal
+      - action: it.todo と test.skip を検出する
+        expect:
+          - exit code が 1
+          - WARN 行にファイル名が含まれる
+        type: normal
+      - action: 存在しない tests-dir を指定する
+        expect:
+          - exit code が 1
+          - WARN 行にディレクトリが見つからないメッセージが含まれる
+        type: error
+      - action: 空のテストディレクトリでチェックする
+        expect:
+          - exit code が 0
+          - 出力にエラーが含まれない
+        type: boundary

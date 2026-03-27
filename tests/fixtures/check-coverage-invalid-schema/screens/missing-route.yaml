@@ -1,0 +1,7 @@
+screen: missing-route
+title: route フィールドがない
+cases:
+  - action: テスト
+    steps:
+      - テスト
+    expect: テスト
