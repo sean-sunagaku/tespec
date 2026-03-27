@@ -42,7 +42,7 @@ describe('Viewer Setup 詳細', () => {
   });
 
   describe('異常系', () => {
-    it('存在しない setup ID → アプリがクラッシュしない', () => {
+    it('存在しない setup ID でアクセスする → アプリがクラッシュしない', () => {
       render(<App data={project} />);
       expect(screen.getByTestId('app-root')).toBeInTheDocument();
     });

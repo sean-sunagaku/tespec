@@ -67,7 +67,7 @@ describe('Viewer ダッシュボード', () => {
   });
 
   describe('異常系', () => {
-    it('YAML に構文エラーがある状態 → アプリがクラッシュしない', () => {
+    it('YAML に構文エラーがある状態でアクセスする → アプリがクラッシュしない', () => {
       render(<App data={project} />);
       expect(screen.getByTestId('app-root')).toBeInTheDocument();
     });

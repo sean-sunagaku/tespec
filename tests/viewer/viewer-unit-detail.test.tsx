@@ -29,7 +29,7 @@ describe('Viewer Unit 詳細', () => {
   });
 
   describe('異常系', () => {
-    it('存在しない unit ID → アプリがクラッシュしない', () => {
+    it('存在しない unit ID でアクセスする → アプリがクラッシュしない', () => {
       render(<App data={project} />);
       expect(screen.getByTestId('app-root')).toBeInTheDocument();
     });

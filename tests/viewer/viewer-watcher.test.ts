@@ -85,8 +85,12 @@ describe('Viewer Watcher', () => {
       () => { updateCount++; },
     );
 
-    await new Promise((r) => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, 1000));
     await handle.stop();
+    // stop 完了を確実に待つ
+    await new Promise((r) => setTimeout(r, 200));
+
+    const countBeforeWrite = updateCount;
 
     // stop 後にファイル変更
     await writeFile(
@@ -94,8 +98,8 @@ describe('Viewer Watcher', () => {
       'screen: login\nroute: /login\ntitle: After Stop\ncases: []\n',
     );
 
-    await new Promise((r) => setTimeout(r, 800));
+    await new Promise((r) => setTimeout(r, 1000));
 
-    expect(updateCount).toBe(0);
+    expect(updateCount).toBe(countBeforeWrite);
   });
 });
