@@ -1,0 +1,31 @@
+screen: viewer-setup-detail
+route: /#/setups/:id
+title: Viewer Setup 詳細
+cases:
+  - action: setup の詳細を表示する
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - / にアクセスする
+      - サイドバーから setup を選択する
+    expect:
+      - setup のタイトルが表示される
+      - steps が順序付きリストで表示される
+    type: normal
+
+  - action: setup を参照している screen が分かる
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - / にアクセスする
+      - 他の screen から参照されている setup を選択する
+    expect: この setup を given で使っている screen 一覧が表示される
+    type: normal
+
+  - action: 存在しない setup ID でアクセスする
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - /#/setups/nonexistent にアクセスする
+    expect: 該当なしのメッセージが表示される
+    type: error

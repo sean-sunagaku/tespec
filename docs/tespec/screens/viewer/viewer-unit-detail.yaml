@@ -1,0 +1,33 @@
+screen: viewer-unit-detail
+route: /#/units/:id
+title: Viewer Unit 詳細
+cases:
+  - action: unit の詳細を表示する
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - / にアクセスする
+      - サイドバーから unit を選択する
+    expect:
+      - unit のタイトルが表示される
+      - methods 一覧が表示される
+    type: normal
+
+  - action: method ごとの cases を確認する
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - / にアクセスする
+      - unit を選択する
+    expect:
+      - method 名がセクション見出しで表示される
+      - 各 method の cases がタイプ別に表示される
+    type: normal
+
+  - action: 存在しない unit ID でアクセスする
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - /#/units/nonexistent にアクセスする
+    expect: 該当なしのメッセージが表示される
+    type: error

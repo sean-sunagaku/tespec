@@ -1,0 +1,71 @@
+screen: viewer-dashboard
+route: /
+title: Viewer ダッシュボード
+cases:
+  - action: ページを開く
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - / にアクセスする
+    expect:
+      - サイドバーに screens 一覧が表示される
+      - サイドバーに units 一覧が表示される
+      - サイドバーに setups 一覧が表示される
+    type: normal
+
+  - action: screen を選択する
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - / にアクセスする
+      - サイドバーの screen 項目をクリックする
+    expect: screen の詳細がメインエリアに表示される
+    type: normal
+    navigates_to: viewer-screen-detail
+
+  - action: unit を選択する
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - / にアクセスする
+      - サイドバーの unit 項目をクリックする
+    expect: unit の詳細がメインエリアに表示される
+    type: normal
+    navigates_to: viewer-unit-detail
+
+  - action: setup を選択する
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - / にアクセスする
+      - サイドバーの setup 項目をクリックする
+    expect: setup の詳細がメインエリアに表示される
+    type: normal
+    navigates_to: viewer-setup-detail
+
+  - action: YAML ファイルを変更する
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - / にアクセスする
+      - YAML ファイルを編集して保存する
+    expect: ブラウザの表示が自動的に更新される
+    type: normal
+
+  - action: YAML に構文エラーがある状態でアクセスする
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - YAML ファイルに不正な構文を書いて保存する
+    expect: エラーメッセージが表示される
+    not_expect:
+      - アプリがクラッシュする
+    type: error
+
+  - action: specs が0件のプロジェクトで開く
+    given: viewer_running_empty
+    steps:
+      - "use:viewer_running_empty"
+      - / にアクセスする
+    expect: 空状態のメッセージが表示される
+    type: boundary
