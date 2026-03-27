@@ -1,0 +1,66 @@
+screen: viewer-screen-detail
+route: /#/screens/:id
+title: Viewer Screen 詳細
+cases:
+  - action: screen の詳細を表示する
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - / にアクセスする
+      - サイドバーから screen を選択する
+    expect:
+      - screen のタイトルが表示される
+      - route が表示される
+      - cases 一覧が表示される
+    type: normal
+
+  - action: cases がタイプ別に分類される
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - / にアクセスする
+      - 複数タイプの case を持つ screen を選択する
+    expect:
+      - normal ケースが表示される
+      - error ケースが表示される
+      - boundary ケースが表示される
+    type: normal
+
+  - action: given 参照を確認する
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - / にアクセスする
+      - given を持つ case がある screen を選択する
+    expect: given の setup 名がリンクとして表示される
+    type: normal
+    navigates_to: viewer-setup-detail
+
+  - action: navigates_to 参照を確認する
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - / にアクセスする
+      - navigates_to を持つ case がある screen を選択する
+    expect: 遷移先の screen 名がリンクとして表示される
+    type: normal
+
+  - action: steps が表示される
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - / にアクセスする
+      - screen を選択する
+      - case を展開する
+    expect: steps が順序付きリストで表示される
+    type: normal
+
+  - action: 存在しない screen ID でアクセスする
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - /#/screens/nonexistent にアクセスする
+    expect: 該当なしのメッセージが表示される
+    not_expect:
+      - アプリがクラッシュする
+    type: error

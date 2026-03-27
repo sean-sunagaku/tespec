@@ -1,0 +1,5 @@
+setup: viewer_running
+title: Viewer サーバー起動済み
+steps:
+  - tespec view を実行する
+  - サーバーが起動しブラウザが開く

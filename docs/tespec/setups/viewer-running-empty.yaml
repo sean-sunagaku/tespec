@@ -1,0 +1,5 @@
+setup: viewer_running_empty
+title: Viewer サーバー起動済み（空プロジェクト）
+steps:
+  - screens/setups/units が空のプロジェクトで tespec view を実行する
+  - サーバーが起動しブラウザが開く
