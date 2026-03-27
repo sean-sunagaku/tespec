@@ -1,0 +1,28 @@
+unit: generator-unit-vitest
+title: Vitest Unit テストジェネレーター
+methods:
+  - method: generate
+    cases:
+      - action: 正常系のみの unit spec からテストを生成する
+        expect: describe 内に正常系テストが含まれる
+        type: normal
+      - action: 異常系ケースを含む method からテストを生成する
+        expect: 異常系セクション内にテストが含まれる
+        type: normal
+      - action: 境界値ケースを含む method からテストを生成する
+        expect: 境界値セクション内にテストが含まれる
+        type: normal
+      - action: 複数 method を持つ unit spec からテストを生成する
+        expect: method ごとにネストされた describe が含まれる
+        type: normal
+      - action: expect が配列の場合
+        expect:
+          - 複数の期待値が結合される
+          - テスト名に含まれる
+        type: boundary
+
+  - method: fileNameFor
+    cases:
+      - action: unit ID からファイル名を生成する
+        expect: unitId.test.ts が返る
+        type: normal

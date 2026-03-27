@@ -1,0 +1,87 @@
+unit: command-validate
+title: validate コマンド
+methods:
+  - method: run
+    cases:
+      - action: 有効な config で全ファイルをバリデーションする
+        expect:
+          - 各 screen に OK が表示される
+          - 各 unit に OK が表示される
+        type: normal
+      - action: --file フラグで screen YAML を単体バリデーションする
+        expect: OK が表示される
+        type: normal
+      - action: --file フラグで setup YAML を単体バリデーションする
+        expect: OK が表示される
+        type: normal
+      - action: --file フラグで unit YAML を単体バリデーションする
+        expect: OK が表示される
+        type: normal
+      - action: --file と --config を同時に指定する
+        expect: 排他エラーが表示されて終了する
+        type: error
+      - action: config のパースに失敗する
+        expect: パースエラーが表示されて終了する
+        type: error
+      - action: バリデーションエラーがある spec をバリデーションする
+        expect:
+          - エラーが表示される
+          - 終了コード 1 で終了する
+        type: error
+      - action: 存在しないファイルを --file で指定する
+        expect: ファイル未検出エラーが表示される
+        type: error
+      - action: 不正な YAML を --file で指定する
+        expect: パースエラーが表示される
+        type: error
+
+  - method: validateSingleFile
+    cases:
+      - action: 有効な screen YAML をバリデーションする
+        expect: ScreenSchema でパース成功して OK が表示される
+        type: normal
+      - action: 有効な setup YAML をバリデーションする
+        expect: SetupSchema でパース成功して OK が表示される
+        type: normal
+      - action: 有効な unit YAML をバリデーションする
+        expect: UnitSpecSchema でパース成功して OK が表示される
+        type: normal
+      - action: どのスキーマにも合致しない YAML をバリデーションする
+        expect: エラーが表示されて終了する
+        type: error
+
+  - method: selectSingleFileErrors
+    cases:
+      - action: ファイル読み込みエラーがある場合
+        expect: 読み込みエラーが優先して返る
+        type: normal
+      - action: YAML 構文エラーがある場合
+        expect: YAML エラーが優先して返る
+        type: normal
+      - action: パスに /units/ が含まれる場合
+        expect: unitErrors が返る
+        type: normal
+      - action: パスに /setups/ が含まれる場合
+        expect: setupErrors が返る
+        type: normal
+      - action: いずれのパターンにも該当しない場合
+        expect: screenErrors が返る
+        type: boundary
+
+  - method: resolveConfigPath
+    cases:
+      - action: パスを指定してコンフィグパスを解決する
+        expect: 指定パスの絶対パスが返る
+        type: normal
+      - action: パス未指定でコンフィグパスを解決する
+        expect: デフォルトパス ./docs/tespec/config.yaml の絶対パスが返る
+        type: boundary
+
+  - method: toDisplayPath
+    cases:
+      - action: 絶対パスを表示用パスに変換する
+        expect: cwd からの相対パスが返る
+        type: normal
+      - action: cwd と同一のパスを変換する
+        expect: ファイル名のみが返る
+        type: boundary

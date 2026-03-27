@@ -1,0 +1,56 @@
+unit: generator-screen-xctest
+title: XCTest Screen テストジェネレーター
+methods:
+  - method: generateSwiftTestFile
+    cases:
+      - action: 正常系のみの screen からテストを生成する
+        expect: XCTestCase クラス内に正常系テストメソッドが含まれる
+        type: normal
+      - action: 異常系ケースを含む screen からテストを生成する
+        expect: MARK コメント付きの異常系セクションが含まれる
+        type: normal
+      - action: 境界値ケースを含む screen からテストを生成する
+        expect: MARK コメント付きの境界値セクションが含まれる
+        type: normal
+      - action: given 付きケースのメソッド名を生成する
+        expect: メソッド名に given の値がプレフィックスとして含まれる
+        type: normal
+      - action: not_expect 付きケースからテストを生成する
+        expect: コメントに not_expect の値が含まれる
+        type: normal
+      - action: steps 内の use:setup_id を setup タイトルに解決する
+        expect: コメントに setup のタイトルが含まれる
+        type: normal
+      - action: import XCTest が含まれる
+        expect: ファイル先頭に import XCTest が生成される
+        type: normal
+      - action: expect が配列の場合
+        expect: 先頭の期待値がメソッド名に使われる
+        type: boundary
+      - action: cases が空の type グループの場合
+        expect: そのグループの MARK セクションが出力されない
+        type: boundary
+
+  - method: fileNameFor
+    cases:
+      - action: screen ID からファイル名を生成する
+        expect: PascalCase に変換された ScreenIdTests.swift が返る
+        type: normal
+      - action: ハイフン区切りの screen ID からファイル名を生成する
+        expect: ハイフンで分割して PascalCase に変換される
+        type: normal
+      - action: アンダースコア区切りの screen ID からファイル名を生成する
+        expect: アンダースコアで分割して PascalCase に変換される
+        type: normal
+
+  - method: sanitize
+    cases:
+      - action: 空白を含む文字列をサニタイズする
+        expect: 空白がアンダースコアに置換される
+        type: normal
+      - action: 特殊記号を含む文字列をサニタイズする
+        expect: Unicode 文字とアンダースコア以外が除去される
+        type: normal
+      - action: 日本語を含む文字列をサニタイズする
+        expect: 日本語文字が保持される
+        type: boundary

@@ -46,6 +46,46 @@ npx tespec generate -c docs/tespec/config.yaml --unit-target xctest
 
 YAML の仕様と記述ガイドは [docs/tespec-design.md](docs/tespec-design.md) を参照してください。
 
+## Claude Code Skill
+
+Claude Code で tespec の YAML を自動生成・検証するための Skill を提供しています。
+
+### インストール
+
+```bash
+npx skills add https://github.com/sean-sunagaku/tespec/tree/main/skills/tespec-yaml-gen
+```
+
+### リポジトリから直接インストール（開発者向け）
+
+このリポジトリをクローンしている場合、スキーマから最新のルールを生成してインストールできます:
+
+```bash
+pnpm skill:install
+```
+
+これは以下を実行します:
+1. `src/core/schema.ts` から最新の rules を生成
+2. `~/.claude/skills/tespec-yaml-gen/` に同期
+
+### 更新
+
+```bash
+npx skills add https://github.com/sean-sunagaku/tespec/tree/main/skills/tespec-yaml-gen
+```
+
+同じコマンドで最新版に上書きインストールされます。リポジトリ開発者は `pnpm skill:install` で最新化できます。
+
+### 使い方
+
+Claude Code で以下のように呼び出せます:
+
+- 「画面仕様を作りたい」
+- 「tespec YAML を書きたい」
+- 「画面の操作を洗い出したい」
+
+Skill が画面・操作・遷移の洗い出しをガイドし、正しいフォーマットの YAML を生成します。
+
 ## License
 
 MIT

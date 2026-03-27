@@ -1,16 +1,7 @@
 import type { UnitSpec } from './schema.js';
+import type { ValidationIssue, ValidationResult } from './validation-types.js';
 
-export interface ValidationIssue {
-  level: 'error' | 'warning';
-  file: string;
-  field: string;
-  message: string;
-}
-
-export interface ValidationResult {
-  issues: ValidationIssue[];
-  hasErrors: boolean;
-}
+export type { ValidationIssue, ValidationResult };
 
 export function validateUnits(units: UnitSpec[]): ValidationResult {
   const issues: ValidationIssue[] = [];

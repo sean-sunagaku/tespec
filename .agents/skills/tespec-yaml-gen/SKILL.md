@@ -101,20 +101,113 @@ tespec validate --config <path-to-config.yaml>
 
 ---
 
+## Unit YAML の作り方
+
+Unit YAML はソースコードのファイル単位で作成する。ディレクトリ構成もソースコードのリポジトリ構造に合わせる。
+
+### 原則
+
+- 1 ソースファイル = 1 Unit YAML
+- units_dir 配下のディレクトリ構成を src/ のディレクトリ構成に合わせる
+- unit ID はファイル名ベースで付ける
+- method はそのファイルの公開関数やクラスメソッドに対応させる
+
+### ディレクトリ構成の例
+
+ソースコードが以下の場合:
+```text
+src/
+├── core/
+│   ├── parser.ts
+│   ├── schema.ts
+│   └── validator.ts
+└── generators/
+    ├── registry.ts
+    └── screen/
+        └── playwright.ts
+```
+
+Unit YAML は以下のように配置する:
+```text
+docs/tespec/units/
+├── core/
+│   ├── parser.yaml
+│   ├── schema.yaml
+│   └── validator.yaml
+└── generators/
+    ├── registry.yaml
+    └── screen/
+        └── playwright.yaml
+```
+
+### Unit YAML の書き方
+
+```yaml
+unit: parser
+title: YAML パーサー
+methods:
+  - method: parseProject
+    cases:
+      - action: 有効な config で全 spec をパースする
+        expect:
+          - screens が ParsedProject に含まれる
+          - setups が ParsedProject に含まれる
+          - units が ParsedProject に含まれる
+        type: normal
+      - action: 存在しないディレクトリを指定する
+        expect: エラーが errors に含まれる
+        type: error
+      - action: screens が 0 件のプロジェクトをパースする
+        expect: screens が空配列で返る
+        type: boundary
+```
+
+- expect は文字列でも配列でも書ける。検証項目が複数あるなら配列にする
+- type は normal / error / boundary の 3 種類。各 method に最低 1 つずつ含めると warning を避けられる
+
+### TDD ファースト
+
+tespec YAML から実装する際は、テストを全て先に作成してから実装コードを書く。BE も FE も同様。
+
+1. tespec YAML でテスト仕様を定義する
+2. `tespec generate` でテストスケルトンを生成する
+3. テストの中身を実装する（この時点でテストは RED）
+4. 実装コードを書いて GREEN にする
+
+この順序を守ることで、仕様通りの実装が担保される。
+
+### 画面を伴う実装には必ず Viewer テストを作る
+
+Viewer コンポーネントを追加・変更する場合は、必ず対応するテストファイルを作成する。
+
+- 新しい Detail コンポーネントを追加 → `tests/viewer/viewer-<name>.test.tsx` を作成
+- 対応する Screen YAML spec を `docs/tespec/screens/viewer/` に追加
+- `tests/viewer/viewer-spec-coverage.test.ts` がテストと YAML spec の対応を自動検証するため、片方だけ作ると CI で検出される
+
+例: `WorkflowDetail.tsx` を追加した場合
+- テスト: `tests/viewer/viewer-workflow-detail.test.tsx`
+- YAML spec: `docs/tespec/screens/viewer/viewer-workflow-detail.yaml`
+
+---
+
 ## File Layout
 
 ```text
 docs/tespec/
 ├── config.yaml
 ├── screens/
-│   ├── <feature>/          ← 機能別サブディレクトリ対応（再帰スキャン）
+│   ├── <feature>/          ← 機能別サブディレクトリ対応
 │   │   └── <screen>.yaml
 │   └── <screen>.yaml
+├── units/
+│   ├── <src-dir>/          ← ソースコードのディレクトリ構成に合わせる
+│   │   └── <file>.yaml
+│   └── <file>.yaml
 └── setups/
     └── <setup>.yaml
 ```
 
-screens_dir 配下のサブディレクトリは再帰的にスキャンされる。機能別に整理できる。
+screens_dir / units_dir 配下のサブディレクトリは再帰的にスキャンされる。
 
 ## References
 

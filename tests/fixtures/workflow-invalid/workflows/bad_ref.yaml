@@ -1,0 +1,5 @@
+workflow: bad_ref
+title: 不正な参照のワークフロー
+steps:
+  - screen: nonexistent_screen
+    action: 存在しない画面を参照する

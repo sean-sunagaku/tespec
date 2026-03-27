@@ -1,5 +1,5 @@
 import type { ParsedProject } from '../../src/core/parser.js';
-import type { Config, Screen, Setup, UnitSpec } from '../../src/core/schema.js';
+import type { Config, Screen, Setup, UnitSpec, Workflow } from '../../src/core/schema.js';
 
 const config: Config = {
   version: 1,
@@ -87,8 +87,19 @@ const units: UnitSpec[] = [
   },
 ];
 
+const workflows: Workflow[] = [
+  {
+    workflow: 'user_registration',
+    title: '新規ユーザー登録フロー',
+    steps: [
+      { screen: 'login', action: '新規登録リンクをタップ' },
+      { screen: 'home', expect: 'ホーム画面が表示される' },
+    ],
+  },
+];
+
 export function createTestProject(): ParsedProject {
-  return { config, screens, setups, units };
+  return { config, screens, setups, units, workflows };
 }
 
 export function createEmptyProject(): ParsedProject {
@@ -97,5 +108,6 @@ export function createEmptyProject(): ParsedProject {
     screens: [],
     setups: [],
     units: [],
+    workflows: [],
   };
 }

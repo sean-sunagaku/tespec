@@ -1,22 +1,25 @@
 import { render } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
-import type { Screen, Setup, UnitSpec } from '../schema.js';
+import type { Screen, Setup, UnitSpec, Workflow } from '../schema.js';
 import { ScreenDetail } from './components/ScreenDetail.js';
 import { SetupDetail } from './components/SetupDetail.js';
 import { UnitDetail } from './components/UnitDetail.js';
+import { WorkflowDetail } from './components/WorkflowDetail.js';
 
 interface SpecsData {
   project: string;
   screens: Screen[];
   setups: Setup[];
   units: UnitSpec[];
+  workflows: Workflow[];
 }
 
 type View =
   | { type: 'dashboard' }
   | { type: 'screen'; id: string }
   | { type: 'unit'; id: string }
-  | { type: 'setup'; id: string };
+  | { type: 'setup'; id: string }
+  | { type: 'workflow'; id: string };
 
 function Badge({ type }: { type: string }) {
   const colors: Record<string, string> = {
@@ -101,7 +104,11 @@ function BrowserApp() {
     );
   }
 
-  const isEmpty = data.screens.length === 0 && data.units.length === 0 && data.setups.length === 0;
+  const isEmpty =
+    data.screens.length === 0 &&
+    data.units.length === 0 &&
+    data.setups.length === 0 &&
+    data.workflows.length === 0;
 
   return (
     <div data-testid="app-root" class="flex w-full">
@@ -163,6 +170,24 @@ function BrowserApp() {
                 onClick={() => navigate('setup', s.setup)}
               >
                 {s.setup}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {data.workflows.length > 0 && (
+          <div>
+            <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+              Workflows
+            </h3>
+            {data.workflows.map((w) => (
+              <div
+                key={w.workflow}
+                data-testid={`sidebar-workflow-${w.workflow}`}
+                class={`px-2 py-1.5 rounded cursor-pointer text-sm ${view.type === 'workflow' && view.id === w.workflow ? 'bg-blue-50 text-blue-700 font-medium' : 'hover:bg-gray-50'}`}
+                onClick={() => navigate('workflow', w.workflow)}
+              >
+                {w.workflow}
               </div>
             ))}
           </div>
@@ -286,7 +311,7 @@ function BrowserApp() {
             )}
 
             {data.setups.length > 0 && (
-              <div>
+              <div class="mb-8">
                 <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
                   Setups
                 </h2>
@@ -302,6 +327,44 @@ function BrowserApp() {
                       </div>
                       <div class="text-xs text-gray-400 font-mono mb-3">{s.setup}</div>
                       <div class="text-sm text-gray-500">{s.steps.length} steps</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {data.workflows.length > 0 && (
+              <div>
+                <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                  Workflows
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {data.workflows.map((w) => (
+                    <div
+                      key={w.workflow}
+                      class="bg-white rounded-xl border border-gray-200 p-5 cursor-pointer hover:shadow-lg hover:border-blue-200 transition-all group"
+                      onClick={() => navigate('workflow', w.workflow)}
+                    >
+                      <div class="flex items-start justify-between mb-2">
+                        <div class="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">
+                          {w.title}
+                        </div>
+                        <svg
+                          class="w-4 h-4 text-gray-300 group-hover:text-blue-400 transition-colors mt-1"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </div>
+                      <div class="text-xs text-gray-400 font-mono mb-3">{w.workflow}</div>
+                      <div class="text-sm text-gray-500">{w.steps.length} steps</div>
                     </div>
                   ))}
                 </div>
@@ -334,6 +397,12 @@ function BrowserApp() {
                 onNavigate={navigate}
               />
             ) : null;
+          })()}
+
+        {view.type === 'workflow' &&
+          (() => {
+            const w = data.workflows.find((wf) => wf.workflow === view.id);
+            return w ? <WorkflowDetail workflow={w} onNavigate={navigate} /> : null;
           })()}
       </main>
     </div>

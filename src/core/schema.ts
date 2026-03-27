@@ -41,12 +41,25 @@ export const UnitSpecSchema = z.object({
   methods: z.array(UnitMethodSchema),
 });
 
+export const WorkflowStepSchema = z.object({
+  screen: z.string(),
+  action: z.string().optional(),
+  expect: z.string().optional(),
+});
+
+export const WorkflowSchema = z.object({
+  workflow: z.string(),
+  title: z.string(),
+  steps: z.array(WorkflowStepSchema).min(1),
+});
+
 export const ConfigSchema = z.object({
   version: z.number(),
   project: z.string(),
   screens_dir: z.string().default('./screens'),
   setups_dir: z.string().default('./setups'),
   units_dir: z.string().optional(),
+  workflows_dir: z.string().optional(),
 });
 
 export type Case = z.infer<typeof CaseSchema>;
@@ -55,4 +68,6 @@ export type Setup = z.infer<typeof SetupSchema>;
 export type UnitCase = z.infer<typeof UnitCaseSchema>;
 export type UnitMethod = z.infer<typeof UnitMethodSchema>;
 export type UnitSpec = z.infer<typeof UnitSpecSchema>;
+export type WorkflowStep = z.infer<typeof WorkflowStepSchema>;
+export type Workflow = z.infer<typeof WorkflowSchema>;
 export type Config = z.infer<typeof ConfigSchema>;

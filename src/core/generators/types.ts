@@ -1,4 +1,4 @@
-import type { Screen, Setup, UnitSpec } from '../schema.js';
+import type { Screen, Setup, UnitSpec, Workflow } from '../schema.js';
 
 export type ScreenTarget = 'playwright' | 'vitest' | 'xctest';
 
@@ -12,4 +12,11 @@ export type UnitTarget = 'vitest' | 'xctest';
 export interface UnitGenerator {
   generate(unit: UnitSpec): string;
   fileNameFor(unitId: string): string;
+}
+
+export type WorkflowTarget = 'playwright';
+
+export interface WorkflowGenerator {
+  generate(workflow: Workflow): string;
+  fileNameFor(workflowId: string): string;
 }

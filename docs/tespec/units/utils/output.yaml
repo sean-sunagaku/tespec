@@ -1,0 +1,26 @@
+unit: output
+title: 出力ユーティリティ
+methods:
+  - method: printError
+    cases:
+      - action: ファイル名とメッセージでエラーを出力する
+        expect: ERROR プレフィックス付きで stderr に出力される
+        type: normal
+
+  - method: printWarning
+    cases:
+      - action: ファイル名とメッセージで警告を出力する
+        expect: WARN プレフィックス付きで stderr に出力される
+        type: normal
+
+  - method: printOk
+    cases:
+      - action: ファイル名で成功を出力する
+        expect: OK プレフィックス付きで stdout に出力される
+        type: normal
+
+  - method: printSuccess
+    cases:
+      - action: メッセージで成功を出力する
+        expect: 太字緑色で stdout に出力される
+        type: normal

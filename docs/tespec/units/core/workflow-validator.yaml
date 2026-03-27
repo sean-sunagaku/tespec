@@ -1,0 +1,35 @@
+unit: workflow-validator
+title: Workflow バリデーター
+methods:
+  - method: validateWorkflows
+    cases:
+      - action: 有効な workflows と screens でバリデーションする
+        expect:
+          - hasErrors が false
+          - issues が空
+        type: normal
+      - action: 重複する workflow ID を検出する
+        expect:
+          - hasErrors が true
+          - 重複エラーが報告される
+        type: error
+      - action: 存在しない screen ID を steps で参照する
+        expect:
+          - hasErrors が true
+          - screen 参照エラーが報告される
+        type: error
+      - action: 複数エラーが同時に発生する
+        expect:
+          - hasErrors が true
+          - 全ての issues が列挙される
+        type: error
+      - action: 全ステップが action も expect も未記述の場合
+        expect:
+          - hasErrors が false
+          - warning で未記述と報告される
+        type: boundary
+      - action: workflows が空配列の場合
+        expect:
+          - hasErrors が false
+          - issues が空
+        type: boundary

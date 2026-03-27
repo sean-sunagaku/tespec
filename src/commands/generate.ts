@@ -6,14 +6,18 @@ import { Command, Flags } from '@oclif/core';
 import {
   getScreenGenerator,
   getUnitGenerator,
+  getWorkflowGenerator,
   isScreenTarget,
   isUnitTarget,
+  isWorkflowTarget,
   SCREEN_TARGETS,
   UNIT_TARGETS,
+  WORKFLOW_TARGETS,
 } from '../core/generators/registry.js';
 import { parseProject } from '../core/parser.js';
 import { validateUnits } from '../core/unit-validator.js';
 import { validate } from '../core/validator.js';
+import { validateWorkflows } from '../core/workflow-validator.js';
 import { printError, printSuccess, printWarning } from '../utils/output.js';
 
 const DEFAULT_OUTPUT_DIR = './tests';
@@ -32,6 +36,7 @@ export default class Generate extends Command {
     unit: Flags.string({
       description: 'Generate only a specific unit id',
     }),
+    workflow: Flags.string({ description: 'Generate only a specific workflow id' }),
     'dry-run': Flags.boolean({
       description: 'Print generated output instead of writing files',
       default: false,
@@ -52,6 +57,11 @@ export default class Generate extends Command {
       options: [...UNIT_TARGETS],
       default: 'vitest',
     }),
+    'workflow-target': Flags.string({
+      description: 'Target test framework for workflow specs',
+      options: [...WORKFLOW_TARGETS],
+      default: 'playwright',
+    }),
   };
 
   async run(): Promise<void> {
@@ -67,9 +77,14 @@ export default class Generate extends Command {
       printError('unit-target', `Unknown unit target: ${flags['unit-target']}`);
       this.exit(1);
     }
+    if (!isWorkflowTarget(flags['workflow-target'])) {
+      printError('workflow-target', `Unknown workflow target: ${flags['workflow-target']}`);
+      this.exit(1);
+    }
 
     const screenGenerator = getScreenGenerator(flags.target);
     const unitGenerator = getUnitGenerator(flags['unit-target']);
+    const workflowGenerator = getWorkflowGenerator(flags['workflow-target']);
 
     const parsed = await parseProject(configPath);
 
@@ -83,7 +98,12 @@ export default class Generate extends Command {
 
     const screenValidation = validate(parsed.result.screens, parsed.result.setups);
     const unitValidation = validateUnits(parsed.result.units);
-    const issues = [...screenValidation.issues, ...unitValidation.issues];
+    const workflowValidation = validateWorkflows(parsed.result.workflows, parsed.result.screens);
+    const issues = [
+      ...screenValidation.issues,
+      ...unitValidation.issues,
+      ...workflowValidation.issues,
+    ];
 
     for (const issue of issues) {
       const message = `${issue.field}: ${issue.message}`;
@@ -95,15 +115,23 @@ export default class Generate extends Command {
       }
     }
 
-    if (screenValidation.hasErrors || unitValidation.hasErrors) {
+    if (
+      screenValidation.hasErrors ||
+      unitValidation.hasErrors ||
+      workflowValidation.hasErrors
+    ) {
       this.exit(1);
     }
 
-    const { screens, setups, units } = parsed.result;
-    const shouldGenerateScreens =
-      typeof flags.unit === 'undefined' || typeof flags.screen !== 'undefined';
-    const shouldGenerateUnits =
-      typeof flags.screen === 'undefined' || typeof flags.unit !== 'undefined';
+    const { screens, setups, units, workflows } = parsed.result;
+    const hasScreenFlag = typeof flags.screen !== 'undefined';
+    const hasUnitFlag = typeof flags.unit !== 'undefined';
+    const hasWorkflowFlag = typeof flags.workflow !== 'undefined';
+    const anySpecified = hasScreenFlag || hasUnitFlag || hasWorkflowFlag;
+
+    const shouldGenerateScreens = !anySpecified || hasScreenFlag;
+    const shouldGenerateUnits = !anySpecified || hasUnitFlag;
+    const shouldGenerateWorkflows = !anySpecified || hasWorkflowFlag;
 
     const selectedScreens = shouldGenerateScreens
       ? flags.screen
@@ -115,6 +143,11 @@ export default class Generate extends Command {
         ? units.filter((unit) => unit.unit === flags.unit)
         : units
       : [];
+    const selectedWorkflows = shouldGenerateWorkflows
+      ? flags.workflow
+        ? workflows.filter((workflow) => workflow.workflow === flags.workflow)
+        : workflows
+      : [];
 
     if (flags.screen && selectedScreens.length === 0) {
       printError('screen', `screen "${flags.screen}" が見つかりません`);
@@ -122,6 +155,10 @@ export default class Generate extends Command {
     }
     if (flags.unit && selectedUnits.length === 0) {
       printError('unit', `unit "${flags.unit}" が見つかりません`);
+      this.exit(1);
+    }
+    if (flags.workflow && selectedWorkflows.length === 0) {
+      printError('workflow', `workflow "${flags.workflow}" が見つかりません`);
       this.exit(1);
     }
 
@@ -135,6 +172,11 @@ export default class Generate extends Command {
         id: unit.unit,
         fileName: unitGenerator.fileNameFor(unit.unit),
         content: unitGenerator.generate(unit),
+      })),
+      ...selectedWorkflows.map((workflow) => ({
+        id: workflow.workflow,
+        fileName: workflowGenerator.fileNameFor(workflow.workflow),
+        content: workflowGenerator.generate(workflow),
       })),
     ];
 

@@ -1,0 +1,19 @@
+screen: login
+route: /login
+title: ログイン画面
+cases:
+  - action: 画面を開く
+    steps:
+      - /login にアクセスする
+    expect: フォームが表示される
+    type: normal
+  - action: 未入力で送信する
+    steps:
+      - 送信ボタンをクリックする
+    expect: バリデーションエラーが表示される
+    type: error
+  - action: 空の状態で開く
+    steps:
+      - /login にアクセスする
+    expect: 空のフォームが表示される
+    type: boundary

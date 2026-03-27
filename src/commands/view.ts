@@ -45,6 +45,9 @@ export default class View extends Command {
       ...(parsed.result.config.units_dir
         ? [path.resolve(configDir, parsed.result.config.units_dir)]
         : []),
+      ...(parsed.result.config.workflows_dir
+        ? [path.resolve(configDir, parsed.result.config.workflows_dir)]
+        : []),
     ];
 
     const watcher = watchProject({ directories }, async () => {

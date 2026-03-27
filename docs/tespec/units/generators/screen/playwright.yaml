@@ -1,0 +1,37 @@
+unit: generator-screen-playwright
+title: Playwright Screen テストジェネレーター
+methods:
+  - method: generate
+    cases:
+      - action: 正常系のみの screen からテストを生成する
+        expect: test.describe 内に正常系テストが含まれる
+        type: normal
+      - action: 異常系ケースを含む screen からテストを生成する
+        expect: 異常系セクション内にテストが含まれる
+        type: normal
+      - action: 境界値ケースを含む screen からテストを生成する
+        expect: 境界値セクション内にテストが含まれる
+        type: normal
+      - action: given 付きケースのテスト名を生成する
+        expect: テスト名に given の値がプレフィックスとして含まれる
+        type: normal
+      - action: navigates_to 付きケースからテストを生成する
+        expect: コメントに navigates_to の値が含まれる
+        type: normal
+      - action: not_expect 付きケースからテストを生成する
+        expect: コメントに not_expect の値が含まれる
+        type: normal
+      - action: steps 内の use:setup_id を setup タイトルに解決する
+        expect: コメントに setup のタイトルが含まれる
+        type: normal
+      - action: expect が配列の場合
+        expect:
+          - 複数の期待値が結合される
+          - テスト名に含まれる
+        type: boundary
+
+  - method: fileNameFor
+    cases:
+      - action: screen ID からファイル名を生成する
+        expect: screenId.spec.ts が返る
+        type: normal

@@ -1,0 +1,75 @@
+unit: command-generate
+title: generate コマンド
+methods:
+  - method: run
+    cases:
+      - action: 有効な config で screen テストを生成する
+        expect:
+          - テストファイルが出力ディレクトリに書き出される
+          - 成功メッセージが表示される
+        type: normal
+      - action: --dry-run フラグ付きで実行する
+        expect:
+          - ファイルが書き出されない
+          - 生成内容が標準出力に表示される
+        type: normal
+      - action: --screen フラグで特定 screen のみ生成する
+        expect: 指定した screen のテストファイルのみ生成される
+        type: normal
+      - action: --unit フラグで特定 unit のみ生成する
+        expect: 指定した unit のテストファイルのみ生成される
+        type: normal
+      - action: --target フラグで vitest を指定する
+        expect: Vitest 形式の screen テストが生成される
+        type: normal
+      - action: --unit-target フラグで xctest を指定する
+        expect: XCTest 形式の unit テストが生成される
+        type: normal
+      - action: --out-dir フラグで出力先を変更する
+        expect: 指定ディレクトリにファイルが書き出される
+        type: normal
+      - action: 不正な target を指定する
+        expect: エラーメッセージが表示されて終了する
+        type: error
+      - action: 不正な unit-target を指定する
+        expect: エラーメッセージが表示されて終了する
+        type: error
+      - action: config のパースに失敗する
+        expect: パースエラーが表示されて終了する
+        type: error
+      - action: バリデーションエラーがある spec を生成する
+        expect: バリデーションエラーが表示されて終了する
+        type: error
+      - action: 存在しない screen ID を --screen で指定する
+        expect: screen が見つからないエラーが表示される
+        type: error
+      - action: 存在しない unit ID を --unit で指定する
+        expect: unit が見つからないエラーが表示される
+        type: error
+
+  - method: resolveConfigPath
+    cases:
+      - action: パスを指定してコンフィグパスを解決する
+        expect: 指定パスの絶対パスが返る
+        type: normal
+      - action: パス未指定でコンフィグパスを解決する
+        expect: デフォルトパス ./docs/tespec/config.yaml の絶対パスが返る
+        type: boundary
+
+  - method: resolveOutputDir
+    cases:
+      - action: ディレクトリを指定して出力先を解決する
+        expect: 指定ディレクトリの絶対パスが返る
+        type: normal
+      - action: ディレクトリ未指定で出力先を解決する
+        expect: デフォルト ./tests の絶対パスが返る
+        type: boundary
+
+  - method: toDisplayPath
+    cases:
+      - action: 絶対パスを表示用パスに変換する
+        expect: cwd からの相対パスが返る
+        type: normal
+      - action: cwd と同一のパスを変換する
+        expect: ドットが返る
+        type: boundary

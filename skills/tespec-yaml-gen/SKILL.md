@@ -1,24 +1,21 @@
 ---
 name: tespec-yaml-gen
 description: >
-  機能の画面構成・ユーザー操作・画面遷移を対話で洗い出し、機能要件を確定するスキル。
-  成果物として tespec YAML を出力する。YAML はフォーマットに過ぎない。
-  本質は「何の画面が必要で、各画面で何ができて、どこに遷移するか」という機能要件を明確にすること。
-  Use when: 機能要件を決めたい、画面の操作を洗い出したい、何の画面が必要か整理したい、
-  画面遷移を整理したい、機能仕様を固めたい、テスト仕様を作りたい、
-  どんな画面を作るか考えたい、この機能に何が必要か決めたい。
-  Triggers: "機能要件", "画面仕様", "何の画面が必要", "画面の操作", "操作を洗い出す",
-  "画面遷移", "機能仕様", "何ができるか整理", "tespec YAML", "tespec-yaml-gen",
-  "画面定義", "テスト仕様", "機能を決めたい", "要件を固めたい", "何を作るか整理"
+  画面遷移・ユーザー操作を対話で洗い出し、tespec YAML として定義するスキル。
+  「何の画面があって、各画面で何ができて、どこに遷移するか」を先に整理してから YAML に落とす。
+  YAML をいきなり書かない。まず画面と操作を洗い出す。これが最も重要なステップ。
+  Use when: 画面仕様を作りたい、画面の操作を洗い出したい、画面遷移を整理したい、
+  tespec YAML を書きたい、テスト仕様を作りたい、機能から画面定義に落としたい。
+  Triggers: "tespec YAML", "画面仕様", "画面の操作", "操作を洗い出す", "画面遷移",
+  "tespec-yaml-gen", "screen yaml", "case を書きたい", "画面定義", "テスト仕様",
+  "YAML で仕様", "どんな画面が必要か", "何ができるか整理"
 ---
 
-# tespec-yaml-gen — 機能要件の確定 → YAML 定義
+# tespec-yaml-gen — 画面遷移・操作の洗い出し → YAML 定義
 
-## このスキルは何をするか
+## 核心: YAML を書く前に、画面と操作を洗い出す
 
-**機能要件を決める道具**。「この機能には何の画面が必要で、各画面で何ができて、どこに遷移するか」を対話で洗い出し、確定する。
-
-YAML はただの出力フォーマット。本質は機能要件の明確化。
+YAML はただのフォーマット。本当に大事なのは「何の画面があって、各画面で何ができて、どこに遷移するか」を明確にすること。
 
 **このスキルの最重要ワークフロー:**
 
@@ -104,20 +101,113 @@ tespec validate --config <path-to-config.yaml>
 
 ---
 
+## Unit YAML の作り方
+
+Unit YAML はソースコードのファイル単位で作成する。ディレクトリ構成もソースコードのリポジトリ構造に合わせる。
+
+### 原則
+
+- 1 ソースファイル = 1 Unit YAML
+- units_dir 配下のディレクトリ構成を src/ のディレクトリ構成に合わせる
+- unit ID はファイル名ベースで付ける
+- method はそのファイルの公開関数やクラスメソッドに対応させる
+
+### ディレクトリ構成の例
+
+ソースコードが以下の場合:
+```text
+src/
+├── core/
+│   ├── parser.ts
+│   ├── schema.ts
+│   └── validator.ts
+└── generators/
+    ├── registry.ts
+    └── screen/
+        └── playwright.ts
+```
+
+Unit YAML は以下のように配置する:
+```text
+docs/tespec/units/
+├── core/
+│   ├── parser.yaml
+│   ├── schema.yaml
+│   └── validator.yaml
+└── generators/
+    ├── registry.yaml
+    └── screen/
+        └── playwright.yaml
+```
+
+### Unit YAML の書き方
+
+```yaml
+unit: parser
+title: YAML パーサー
+methods:
+  - method: parseProject
+    cases:
+      - action: 有効な config で全 spec をパースする
+        expect:
+          - screens が ParsedProject に含まれる
+          - setups が ParsedProject に含まれる
+          - units が ParsedProject に含まれる
+        type: normal
+      - action: 存在しないディレクトリを指定する
+        expect: エラーが errors に含まれる
+        type: error
+      - action: screens が 0 件のプロジェクトをパースする
+        expect: screens が空配列で返る
+        type: boundary
+```
+
+- expect は文字列でも配列でも書ける。検証項目が複数あるなら配列にする
+- type は normal / error / boundary の 3 種類。各 method に最低 1 つずつ含めると warning を避けられる
+
+### TDD ファースト
+
+tespec YAML から実装する際は、テストを全て先に作成してから実装コードを書く。BE も FE も同様。
+
+1. tespec YAML でテスト仕様を定義する
+2. `tespec generate` でテストスケルトンを生成する
+3. テストの中身を実装する（この時点でテストは RED）
+4. 実装コードを書いて GREEN にする
+
+この順序を守ることで、仕様通りの実装が担保される。
+
+### 画面を伴う実装には必ず Viewer テストを作る
+
+Viewer コンポーネントを追加・変更する場合は、必ず対応するテストファイルを作成する。
+
+- 新しい Detail コンポーネントを追加 → `tests/viewer/viewer-<name>.test.tsx` を作成
+- 対応する Screen YAML spec を `docs/tespec/screens/viewer/` に追加
+- `tests/viewer/viewer-spec-coverage.test.ts` がテストと YAML spec の対応を自動検証するため、片方だけ作ると CI で検出される
+
+例: `WorkflowDetail.tsx` を追加した場合
+- テスト: `tests/viewer/viewer-workflow-detail.test.tsx`
+- YAML spec: `docs/tespec/screens/viewer/viewer-workflow-detail.yaml`
+
+---
+
 ## File Layout
 
 ```text
 docs/tespec/
 ├── config.yaml
 ├── screens/
-│   ├── <feature>/          ← 機能別サブディレクトリ対応（再帰スキャン）
+│   ├── <feature>/          ← 機能別サブディレクトリ対応
 │   │   └── <screen>.yaml
 │   └── <screen>.yaml
+├── units/
+│   ├── <src-dir>/          ← ソースコードのディレクトリ構成に合わせる
+│   │   └── <file>.yaml
+│   └── <file>.yaml
 └── setups/
     └── <setup>.yaml
 ```
 
-screens_dir 配下のサブディレクトリは再帰的にスキャンされる。機能別に整理できる。
+screens_dir / units_dir 配下のサブディレクトリは再帰的にスキャンされる。
 
 ## References
 
