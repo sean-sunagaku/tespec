@@ -137,6 +137,30 @@ describe.sequential('generate command', () => {
     expect(result.stdout).toContain('DuplicateEmailError');
   });
 
+  it('prints vitest screen skeletons on dry-run with -t vitest', async () => {
+    const result = await runCommand(Generate, [
+      '--config',
+      configPath('command-ok'),
+      '--dry-run',
+      '--out-dir',
+      'tests/generated',
+      '--target',
+      'vitest',
+    ]);
+
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain('// tests/generated/home.test.ts');
+    expect(result.stdout).toContain('describe("ホーム画面"');
+    expect(result.stdout).toContain('import { describe, it, expect } from "vitest"');
+    expect(result.stdout).not.toContain('@playwright/test');
+    expectStepsInOrder(result.stdout, [
+      '[use:logged_in] ログイン済み状態',
+      '[use:seed_projects] プロジェクト3件のシードデータ',
+      '/ にアクセスする',
+    ]);
+    expect(result.stdout).toContain('files generated');
+  });
+
   it('supports a separate unit target', async () => {
     const result = await runCommand(Generate, [
       '--config',

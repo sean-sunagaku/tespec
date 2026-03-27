@@ -81,24 +81,15 @@ async function parseYamlDirectory<T>(
   directoryPath: string,
   schema: ZodType<T>,
 ): Promise<ParsedDirectoryResult<T>> {
-  let entries: string[];
+  const filePaths = await collectYamlFiles(directoryPath);
 
-  try {
-    const dirents = await readdir(directoryPath, { withFileTypes: true });
-    entries = dirents
-      .filter((dirent) => dirent.isFile() && isYamlFile(dirent.name))
-      .map((dirent) => dirent.name)
-      .sort();
-  } catch (error) {
+  if (filePaths === null) {
     return {
       items: [],
       errors: [
         {
           file: directoryPath,
-          message:
-            error instanceof Error
-              ? `ディレクトリが見つかりません: ${error.message}`
-              : 'ディレクトリが見つかりません',
+          message: `ディレクトリが見つかりません: ${directoryPath}`,
         },
       ],
     };
@@ -107,8 +98,7 @@ async function parseYamlDirectory<T>(
   const items: T[] = [];
   const errors: ParseError[] = [];
 
-  for (const entry of entries) {
-    const filePath = path.join(directoryPath, entry);
+  for (const filePath of filePaths) {
     const parsed = await parseYamlFile(filePath, schema);
     if (parsed.data) {
       items.push(parsed.data);
@@ -118,6 +108,36 @@ async function parseYamlDirectory<T>(
   }
 
   return { items, errors };
+}
+
+async function collectYamlFiles(directoryPath: string): Promise<string[] | null> {
+  let dirents: Awaited<ReturnType<typeof readdir<{ withFileTypes: true }>>>;
+
+  try {
+    dirents = await readdir(directoryPath, { withFileTypes: true });
+  } catch {
+    return null;
+  }
+
+  const files: string[] = [];
+  const subdirs: string[] = [];
+
+  for (const dirent of dirents) {
+    if (dirent.isFile() && isYamlFile(dirent.name)) {
+      files.push(path.join(directoryPath, dirent.name));
+    } else if (dirent.isDirectory()) {
+      subdirs.push(path.join(directoryPath, dirent.name));
+    }
+  }
+
+  for (const subdir of subdirs.sort()) {
+    const subFiles = await collectYamlFiles(subdir);
+    if (subFiles) {
+      files.push(...subFiles);
+    }
+  }
+
+  return files.sort();
 }
 
 export async function parseYamlFile<T>(

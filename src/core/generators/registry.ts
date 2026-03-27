@@ -1,4 +1,5 @@
 import { playwright } from './screen/playwright.js';
+import { vitest as screenVitest } from './screen/vitest.js';
 import { xctest as screenXctest } from './screen/xctest.js';
 import type { ScreenGenerator, ScreenTarget, UnitGenerator, UnitTarget } from './types.js';
 import { vitest } from './unit/vitest.js';
@@ -6,6 +7,7 @@ import { xctest as unitXctest } from './unit/xctest.js';
 
 const SCREEN_REGISTRY: Record<ScreenTarget, ScreenGenerator> = {
   playwright,
+  vitest: screenVitest,
   xctest: screenXctest,
 };
 
