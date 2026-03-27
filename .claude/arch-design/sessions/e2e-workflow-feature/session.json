@@ -1,0 +1,34 @@
+{
+  "sessionId": "e2e-workflow-feature",
+  "topic": "E2E Workflow 機能のアーキテクチャ設計",
+  "status": "in_progress",
+  "mode": "standard",
+  "currentStep": 4,
+  "createdAt": "2026-03-27T00:00:00Z",
+  "updatedAt": "2026-03-27T03:20:00Z",
+  "techStack": {
+    "language": "TypeScript 6",
+    "runtime": "Node.js 18+",
+    "cli": "oclif",
+    "schema": "Zod 4",
+    "webServer": "Hono",
+    "ui": "Preact",
+    "testing": "Vitest",
+    "build": "tsup (esbuild)"
+  },
+  "designPolicy": {
+    "philosophy": "robust",
+    "stepGranularity": "screen-ref-action-expect-only",
+    "testFormat": "single-test-function",
+    "teamSize": "solo",
+    "notes": "既存パイプライン(Schema→Parser→Validator→Generator→Viewer)に乗せる。型安全・バリデーション・エラーハンドリングを徹底"
+  },
+  "steps": {
+    "1_context": true,
+    "2_pattern": true,
+    "3_modules": true,
+    "4_output": false
+  },
+  "selectedPattern": "mirror-vertical-slice-with-shared-validation-types",
+  "modules": []
+}

@@ -1,10 +1,7 @@
 import type { Screen, Workflow } from './schema.js';
 import type { ValidationIssue, ValidationResult } from './validation-types.js';
 
-export function validateWorkflows(
-  workflows: Workflow[],
-  screens: Screen[],
-): ValidationResult {
+export function validateWorkflows(workflows: Workflow[], screens: Screen[]): ValidationResult {
   const issues: ValidationIssue[] = [];
   const screenIds = new Set(screens.map((screen) => screen.screen));
 

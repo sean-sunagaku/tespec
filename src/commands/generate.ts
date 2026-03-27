@@ -115,11 +115,7 @@ export default class Generate extends Command {
       }
     }
 
-    if (
-      screenValidation.hasErrors ||
-      unitValidation.hasErrors ||
-      workflowValidation.hasErrors
-    ) {
+    if (screenValidation.hasErrors || unitValidation.hasErrors || workflowValidation.hasErrors) {
       this.exit(1);
     }
 

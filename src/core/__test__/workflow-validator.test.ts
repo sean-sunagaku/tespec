@@ -146,10 +146,7 @@ describe('validateWorkflows', () => {
     const screens = [createScreen()];
     const workflows = [
       createWorkflow({
-        steps: [
-          { screen: 'home' },
-          { screen: 'home' },
-        ],
+        steps: [{ screen: 'home' }, { screen: 'home' }],
       }),
     ];
 

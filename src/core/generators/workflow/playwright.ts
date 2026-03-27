@@ -21,9 +21,7 @@ function formatStep(step: WorkflowStep, index: number): string {
 }
 
 function generateWorkflowTestFile(workflow: Workflow): string {
-  const steps = workflow.steps
-    .map((step, i) => formatStep(step, i))
-    .join('\n\n');
+  const steps = workflow.steps.map((step, i) => formatStep(step, i)).join('\n\n');
 
   return `import { test, expect } from "@playwright/test";
 
