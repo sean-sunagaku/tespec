@@ -80,11 +80,39 @@ Phase 6: リファクタ     テストが通る状態を維持しながらコー
 tespec generate -c <config-path> -t vitest -o <output-dir>
 ```
 
-- **screen specs** → `<output-dir>/<screen-id>.test.ts` として生成
-- **unit specs** → `<output-dir>/<unit-id>.test.ts` として生成（`--unit-target vitest`）
+- **screen specs** → `<output-dir>/screens/` 配下に生成
+- **unit specs** → `<output-dir>/units/` 配下に生成
+- **workflow specs** → `<output-dir>/workflows/` 配下に生成
 - `--dry-run` で先にプレビューしてからファイル出力すると安全
 
-**出力先のデフォルト**: `tests/<feature-name>/`（機能名でディレクトリを切る）
+### テストディレクトリ構成: tespec YAML と同じ構造にする
+
+テストファイルの配置は tespec YAML のディレクトリ構成をそのままミラーする。
+YAML と テストの対応関係が一目で分かるようにするため。
+
+```
+docs/tespec/                    tests/
+├── screens/                    ├── screens/
+│   ├── workspace.yaml          │   ├── workspace.test.tsx
+│   ├── chat/                   │   ├── chat/
+│   │   └── chat-pane.yaml      │   │   └── chat-pane.test.tsx
+│   └── canvas/                 │   └── canvas/
+│       └── canvas-pane.yaml    │       └── canvas-pane.test.tsx
+├── units/                      ├── units/
+│   ├── lib/ai/                 │   ├── lib/ai/
+│   │   └── parser.yaml         │   │   └── parser.test.ts
+│   └── store/                  │   └── store/
+│       └── store.yaml          │       └── store.test.ts
+└── workflows/                  └── workflows/
+    └── save-load.yaml              └── save-load.spec.ts
+```
+
+**ルール:**
+- `screens/*.yaml` → `tests/screens/*.test.tsx`（JSX を含むため `.tsx`）
+- `units/*.yaml` → `tests/units/*.test.ts`（純粋関数のため `.ts`）
+- `workflows/*.yaml` → `tests/workflows/*.spec.ts`（E2E 的シナリオは `.spec`）
+- サブディレクトリ構造もそのまま維持する
+- `tespec generate` で生成した後、手動でディレクトリを合わせる
 
 ---
 
@@ -136,6 +164,45 @@ import 可能なコンポーネントとして書く。
 
 生成されたスケルトンの `// TODO: implement` を、テスト層に応じて実装する。
 各テストのコメント（Given, Steps, navigates_to, not_expect）をヒントにする。
+
+### CRITICAL: スケルトン構造は変更禁止
+
+`tespec generate` が生成したテストファイルの構造（`describe` / `it` のタイトル・ネスト・順序）は、テスト実装時に一切変更してはならない。
+
+**変更してよいもの:**
+- `// TODO: implement` を実際のテストコードに置き換える
+- `import` 文を追加する
+- ファイル冒頭に `// @vitest-environment jsdom` を追加する
+- `beforeEach` / `afterEach` を追加する
+- ヘルパー関数・モック定義を追加する
+
+**変更してはいけないもの:**
+- `describe("...")` のタイトル文字列
+- `it("...")` のタイトル文字列
+- `describe` / `it` のネスト構造
+- `describe` / `it` の順序
+- `describe` / `it` ブロックの追加・削除
+
+スケルトンの構造は YAML の定義そのもの。テスト実装中に「この `it` のタイトルを変えたい」「case を追加したい」と思ったら、**tespec-imp を止めて /tespec-yaml-gen で YAML を先に修正する**。YAML 修正 → テスト同期が終わってから tespec-imp に戻る。
+
+スケルトン構造を変更すると YAML との乖離が発生し、仕様とテストの対応関係が壊れる。YAML が single source of truth であるという原則を守るために、この制約は厳守する。
+
+**Hook による強制（推奨）:** `scripts/check-skeleton-drift.sh` を PreToolUse Hook として設定すると、テストファイルの `describe`/`it` 構造を変更する Edit/Write が **ブロックされる**（exit 2 で拒否）。settings.json の hooks に以下を追加:
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "command": "echo \"$TOOL_INPUT\" | jq -re '.file_path | test(\"tests/\")' > /dev/null 2>&1 && bash <path-to-tespec-imp>/scripts/check-skeleton-drift.sh || exit 0"
+      }
+    ]
+  }
+}
+```
+
+`jq` でファイルパスが `tests/` 配下かを先にチェックし、テストファイル以外はスクリプトを起動せず即 exit 0 する。テスト対象ディレクトリが異なる場合は `test(\"tests/\")` を変更する。
 
 ### テスト実装のルール
 
