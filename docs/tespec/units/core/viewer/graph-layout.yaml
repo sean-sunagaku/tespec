@@ -39,3 +39,7 @@ methods:
       - action: 50 ノード規模の GraphData でレイアウトを計算する
         expect: レイアウト計算が完了する
         type: boundary
+
+      - action: ノード ID が重複する GraphData でレイアウトを計算する
+        expect: エラーにならず最後のノード定義が使われる
+        type: error

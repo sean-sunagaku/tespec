@@ -1,6 +1,7 @@
 import { render } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import type { Screen, Setup, UnitSpec, Workflow } from '../schema.js';
+import { NodeGraph } from './components/NodeGraph.js';
 import { ScreenDetail } from './components/ScreenDetail.js';
 import { SetupDetail } from './components/SetupDetail.js';
 import { UnitDetail } from './components/UnitDetail.js';
@@ -202,175 +203,184 @@ function BrowserApp() {
         )}
 
         {view.type === 'dashboard' && (
-          <>
-            <CoverageSummary data={data} />
+          <div class="flex h-full gap-0">
+            <div class="flex-1 overflow-y-auto pr-4">
+              <CoverageSummary data={data} />
 
-            {data.screens.length > 0 && (
-              <div class="mb-8">
-                <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                  Screens
-                </h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {data.screens.map((s) => {
-                    const normal = s.cases.filter((c) => c.type === 'normal').length;
-                    const error = s.cases.filter((c) => c.type === 'error').length;
-                    const boundary = s.cases.filter((c) => c.type === 'boundary').length;
-                    return (
-                      <div
-                        key={s.screen}
-                        class="bg-white rounded-xl border border-gray-200 p-5 cursor-pointer hover:shadow-lg hover:border-blue-200 transition-all group"
-                        onClick={() => navigate('screen', s.screen)}
-                      >
-                        <div class="flex items-start justify-between mb-2">
-                          <div class="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">
-                            {s.title}
-                          </div>
-                          <svg
-                            class="w-4 h-4 text-gray-300 group-hover:text-blue-400 transition-colors mt-1"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M9 5l7 7-7 7"
-                            />
-                          </svg>
-                        </div>
-                        <div class="text-xs text-gray-400 font-mono mb-3">{s.route}</div>
-                        <div class="flex items-center justify-between">
-                          <div class="text-sm text-gray-500">{s.cases.length} cases</div>
-                          <div class="flex gap-1.5">
-                            {normal > 0 && (
-                              <span class="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full">
-                                {normal}
-                              </span>
-                            )}
-                            {error > 0 && (
-                              <span class="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full">
-                                {error}
-                              </span>
-                            )}
-                            {boundary > 0 && (
-                              <span class="text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full">
-                                {boundary}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {data.units.length > 0 && (
-              <div class="mb-8">
-                <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                  Units
-                </h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {data.units.map((u) => {
-                    const totalCases = u.methods.reduce((sum, m) => sum + m.cases.length, 0);
-                    return (
-                      <div
-                        key={u.unit}
-                        class="bg-white rounded-xl border border-gray-200 p-5 cursor-pointer hover:shadow-lg hover:border-blue-200 transition-all group"
-                        onClick={() => navigate('unit', u.unit)}
-                      >
-                        <div class="flex items-start justify-between mb-2">
-                          <div class="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">
-                            {u.title}
-                          </div>
-                          <svg
-                            class="w-4 h-4 text-gray-300 group-hover:text-blue-400 transition-colors mt-1"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M9 5l7 7-7 7"
-                            />
-                          </svg>
-                        </div>
-                        <div class="text-xs text-gray-400 font-mono mb-3">{u.unit}</div>
-                        <div class="text-sm text-gray-500">
-                          {u.methods.length} methods / {totalCases} cases
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {data.setups.length > 0 && (
-              <div class="mb-8">
-                <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                  Setups
-                </h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {data.setups.map((s) => (
-                    <div
-                      key={s.setup}
-                      class="bg-white rounded-xl border border-gray-200 p-5 cursor-pointer hover:shadow-lg hover:border-blue-200 transition-all group"
-                      onClick={() => navigate('setup', s.setup)}
-                    >
-                      <div class="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors mb-1">
-                        {s.title}
-                      </div>
-                      <div class="text-xs text-gray-400 font-mono mb-3">{s.setup}</div>
-                      <div class="text-sm text-gray-500">{s.steps.length} steps</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {data.workflows.length > 0 && (
-              <div>
-                <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                  Workflows
-                </h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {data.workflows.map((w) => (
-                    <div
-                      key={w.workflow}
-                      class="bg-white rounded-xl border border-gray-200 p-5 cursor-pointer hover:shadow-lg hover:border-blue-200 transition-all group"
-                      onClick={() => navigate('workflow', w.workflow)}
-                    >
-                      <div class="flex items-start justify-between mb-2">
-                        <div class="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">
-                          {w.title}
-                        </div>
-                        <svg
-                          class="w-4 h-4 text-gray-300 group-hover:text-blue-400 transition-colors mt-1"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
+              {data.screens.length > 0 && (
+                <div class="mb-8">
+                  <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                    Screens
+                  </h2>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {data.screens.map((s) => {
+                      const normal = s.cases.filter((c) => c.type === 'normal').length;
+                      const error = s.cases.filter((c) => c.type === 'error').length;
+                      const boundary = s.cases.filter((c) => c.type === 'boundary').length;
+                      return (
+                        <div
+                          key={s.screen}
+                          class="bg-white rounded-xl border border-gray-200 p-5 cursor-pointer hover:shadow-lg hover:border-blue-200 transition-all group"
+                          onClick={() => navigate('screen', s.screen)}
                         >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 5l7 7-7 7"
-                          />
-                        </svg>
-                      </div>
-                      <div class="text-xs text-gray-400 font-mono mb-3">{w.workflow}</div>
-                      <div class="text-sm text-gray-500">{w.steps.length} steps</div>
-                    </div>
-                  ))}
+                          <div class="flex items-start justify-between mb-2">
+                            <div class="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">
+                              {s.title}
+                            </div>
+                            <svg
+                              class="w-4 h-4 text-gray-300 group-hover:text-blue-400 transition-colors mt-1"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 5l7 7-7 7"
+                              />
+                            </svg>
+                          </div>
+                          <div class="text-xs text-gray-400 font-mono mb-3">{s.route}</div>
+                          <div class="flex items-center justify-between">
+                            <div class="text-sm text-gray-500">{s.cases.length} cases</div>
+                            <div class="flex gap-1.5">
+                              {normal > 0 && (
+                                <span class="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full">
+                                  {normal}
+                                </span>
+                              )}
+                              {error > 0 && (
+                                <span class="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full">
+                                  {error}
+                                </span>
+                              )}
+                              {boundary > 0 && (
+                                <span class="text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full">
+                                  {boundary}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            )}
-          </>
+              )}
+
+              {data.units.length > 0 && (
+                <div class="mb-8">
+                  <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                    Units
+                  </h2>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {data.units.map((u) => {
+                      const totalCases = u.methods.reduce((sum, m) => sum + m.cases.length, 0);
+                      return (
+                        <div
+                          key={u.unit}
+                          class="bg-white rounded-xl border border-gray-200 p-5 cursor-pointer hover:shadow-lg hover:border-blue-200 transition-all group"
+                          onClick={() => navigate('unit', u.unit)}
+                        >
+                          <div class="flex items-start justify-between mb-2">
+                            <div class="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">
+                              {u.title}
+                            </div>
+                            <svg
+                              class="w-4 h-4 text-gray-300 group-hover:text-blue-400 transition-colors mt-1"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 5l7 7-7 7"
+                              />
+                            </svg>
+                          </div>
+                          <div class="text-xs text-gray-400 font-mono mb-3">{u.unit}</div>
+                          <div class="text-sm text-gray-500">
+                            {u.methods.length} methods / {totalCases} cases
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {data.setups.length > 0 && (
+                <div class="mb-8">
+                  <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                    Setups
+                  </h2>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {data.setups.map((s) => (
+                      <div
+                        key={s.setup}
+                        class="bg-white rounded-xl border border-gray-200 p-5 cursor-pointer hover:shadow-lg hover:border-blue-200 transition-all group"
+                        onClick={() => navigate('setup', s.setup)}
+                      >
+                        <div class="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors mb-1">
+                          {s.title}
+                        </div>
+                        <div class="text-xs text-gray-400 font-mono mb-3">{s.setup}</div>
+                        <div class="text-sm text-gray-500">{s.steps.length} steps</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {data.workflows.length > 0 && (
+                <div>
+                  <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                    Workflows
+                  </h2>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {data.workflows.map((w) => (
+                      <div
+                        key={w.workflow}
+                        class="bg-white rounded-xl border border-gray-200 p-5 cursor-pointer hover:shadow-lg hover:border-blue-200 transition-all group"
+                        onClick={() => navigate('workflow', w.workflow)}
+                      >
+                        <div class="flex items-start justify-between mb-2">
+                          <div class="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">
+                            {w.title}
+                          </div>
+                          <svg
+                            class="w-4 h-4 text-gray-300 group-hover:text-blue-400 transition-colors mt-1"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M9 5l7 7-7 7"
+                            />
+                          </svg>
+                        </div>
+                        <div class="text-xs text-gray-400 font-mono mb-3">{w.workflow}</div>
+                        <div class="text-sm text-gray-500">{w.steps.length} steps</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div class="w-1/2 border-l border-gray-200 min-h-[400px]">
+              <NodeGraph
+                data={{ screens: data.screens, setups: data.setups, workflows: data.workflows }}
+                onNodeClick={(type, id) => navigate(type, id)}
+              />
+            </div>
+          </div>
         )}
 
         {view.type === 'screen' &&
