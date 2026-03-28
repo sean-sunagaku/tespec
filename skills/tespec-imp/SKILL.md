@@ -40,6 +40,8 @@ Phase 5: GREEN 確認    テスト実行 → 全テスト通過を確認
 Phase 6: リファクタ     テストが通る状態を維持しながらコード改善
      ↓
 Phase 7: 動作確認      ブラウザで実際に起動 → エラー検出 → YAML 追加 → テスト追加 → 修正
+     ↓
+Phase 8: E2E テスト    モックなしで実サービスを呼ぶテスト作成（CI 除外・ローカル専用）
 ```
 
 ### CRITICAL: テスト完全完了ルール
@@ -356,6 +358,92 @@ Chrome 操作ツール（Claude in Chrome 等）がある場合は積極的に�
 
 ---
 
+## Phase 8: E2E テスト（モックなし・ローカル専用）
+
+Phase 1〜7 で作成するテストはモックを使った高速テスト（CI 向け）。
+Phase 8 では**モックなしで実際の外部サービスを呼ぶ E2E テスト**を追加する。
+
+CI には入れない。ローカルでの動作確認・信頼性検証が目的。
+
+### なぜモックなし E2E が必要か
+
+モック化されたテストでは検出できない問題がある:
+- AI の応答が実際にパース可能なフォーマットで返るか
+- プロンプトが意図通りの応答を引き出すか
+- API Route が実際のサブプロセス呼び出しで正常に動くか
+- 結合部分のシリアライズ/デシリアライズが実データで壊れないか
+
+### E2E テストの配置
+
+```
+docs/tespec/e2e/           ← E2E 用 YAML（正本）
+tests/e2e/                 ← E2E テストコード
+  chat-flow.e2e.test.ts    ← Claude CLI 直接呼び出し
+  api-routes.e2e.test.ts   ← dev サーバー経由で API Route 呼び出し
+```
+
+ファイル名は `*.e2e.test.ts` パターン。通常テストと区別する。
+
+### vitest 設定
+
+```typescript
+// vitest.config.ts（CI 用）— E2E を除外
+test: {
+  exclude: ['tests/e2e/**', 'node_modules/**'],
+}
+
+// vitest.e2e.config.ts（ローカル専用）— E2E のみ
+test: {
+  include: ['tests/e2e/**/*.e2e.test.ts'],
+  testTimeout: 120000,  // AI 呼び出しは遅いので長めに
+}
+```
+
+```json
+// package.json
+{
+  "test": "vitest run",           // CI: E2E 除外
+  "test:e2e": "vitest run --config vitest.e2e.config.ts"  // ローカル専用
+}
+```
+
+### E2E テストの書き方
+
+**モックを一切使わない。** 実際のサービスを呼ぶ:
+
+```typescript
+// 直接 Claude CLI を呼ぶ
+import { callClaude } from "@/lib/ai/claude-client";
+
+it("画面設計の指示で JSON が返る", async () => {
+  const response = await callClaude("ログイン画面を設計して", systemPrompt);
+  const parsed = parseCanvasOutput(response.result);
+  expect(parsed.success).toBe(true);
+}, 60000);
+
+// dev サーバー経由で API Route を呼ぶ
+it("POST /api/chat が動く", async () => {
+  const res = await fetch("http://localhost:3000/api/chat", { ... });
+  expect(res.status).toBe(200);
+}, 60000);
+```
+
+### E2E テストの実行条件
+
+| 条件 | 必要 |
+|------|------|
+| Claude Code ログイン済み | 必須（`claude -p` が動くこと） |
+| dev サーバー起動中 | API Route テストの場合のみ |
+| API キー | 不要（Claude Code SDK は OAuth 認証） |
+| CI 環境 | 実行しない |
+
+### YAML も書く
+
+E2E テストも YAML が正本。`docs/tespec/e2e/` に YAML を書いてからテストを実装する。
+ただし E2E 用 YAML は `config.yaml` の `units_dir` とは別管理でよい（validate 対象外でもよい）。
+
+---
+
 ## ユーザーへの進捗報告
 
 各 Phase の完了時に状況を報告する:
@@ -367,6 +455,7 @@ Phase 3 RED:  19テスト全て失敗（Cannot find module）
 Phase 4 実装中: App.tsx 完了 → 12/19 通過
 Phase 5 GREEN: 19テスト全て通過（既存テストも全パス）
 Phase 7 動作確認: Route Handler エラーハンドリング不足を検出 → YAML 3 cases 追加 → 修正完了
+Phase 8 E2E:  2ファイル / 8テスト ローカルで全パス（実 Claude CLI 呼び出し）
 ```
 
 ---
