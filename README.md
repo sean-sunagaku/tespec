@@ -28,6 +28,17 @@ npx tespec validate -c docs/tespec/config.yaml
 npx tespec generate -c docs/tespec/config.yaml --dry-run
 ```
 
+### ビューアー（ノードグラフ付き）
+
+```bash
+npx tespec view -c docs/tespec/config.yaml
+```
+
+ブラウザで `http://localhost:3737` が開き、ダッシュボードに画面遷移のノードグラフが表示されます。
+YAML を編集・保存すると、グラフがリアルタイムで更新されます。
+
+開発時は `pnpm view` でビルド + 起動を一発で実行できます。
+
 `generate` をファイル出力で使うと、既定では `tests/` 配下に Screen Spec 用の Playwright スケルトンと Unit Spec 用の Vitest スケルトンを生成します。
 
 出力先を変えたい場合は `--out-dir` を使えます。

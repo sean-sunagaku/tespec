@@ -33,6 +33,11 @@ export async function startServer(
     return c.html(renderHtml(currentData));
   });
 
+  // SPA fallback: /screen/:id, /unit/:id 等のパスでも HTML を返す
+  app.get('/:type{screen|unit|setup|workflow}/:id', (c) => {
+    return c.html(renderHtml(currentData));
+  });
+
   app.get('/viewer-client.js', async (c) => {
     // dist/viewer/viewer-client.js — tsup のブラウザバンドル出力先
     const jsPath = path.resolve(__dirname, '../viewer/viewer-client.js');

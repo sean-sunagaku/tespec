@@ -28,10 +28,10 @@ export interface LayoutResult {
   height: number;
 }
 
-const DEFAULT_NODE_WIDTH = 160;
-const DEFAULT_NODE_HEIGHT = 60;
-const DEFAULT_RANK_SEP = 80;
-const DEFAULT_NODE_SEP = 40;
+const DEFAULT_NODE_WIDTH = 220;
+const DEFAULT_NODE_HEIGHT = 70;
+const DEFAULT_RANK_SEP = 120;
+const DEFAULT_NODE_SEP = 60;
 
 export function computeLayout(data: GraphData, options?: LayoutOptions): LayoutResult {
   if (data.nodes.length === 0) {

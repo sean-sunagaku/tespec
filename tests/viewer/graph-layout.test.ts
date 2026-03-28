@@ -64,6 +64,8 @@ function createLargeGraph(count: number): GraphData {
   };
 }
 
+type PositionedNode = ReturnType<typeof computeLayout>['nodes'][number];
+
 describe('グラフレイアウト計算', () => {
   describe('computeLayout', () => {
     it('1 ノードの GraphData でレイアウトを計算する → ノードに x, y, width, height が割り当てられる', () => {
@@ -79,36 +81,24 @@ describe('グラフレイアウト計算', () => {
     it('2 ノード 1 エッジの GraphData でレイアウトを計算する → TB 方向で source が target より上に配置される', () => {
       const result = computeLayout(twoNodesOneEdge);
 
-      const login = result.nodes.find((n) => n.id === 'screen:login') as NonNullable<
-        (typeof result.nodes)[number]
-      >;
-      const home = result.nodes.find((n) => n.id === 'screen:home') as NonNullable<
-        (typeof result.nodes)[number]
-      >;
+      const login = result.nodes.find((n) => n.id === 'screen:login') as PositionedNode;
+      const home = result.nodes.find((n) => n.id === 'screen:home') as PositionedNode;
       expect(login.y).toBeLessThan(home.y);
     });
 
     it('デフォルトオプションでレイアウトを計算する → direction が TB で計算される', () => {
       const result = computeLayout(twoNodesOneEdge);
 
-      const login = result.nodes.find((n) => n.id === 'screen:login') as NonNullable<
-        (typeof result.nodes)[number]
-      >;
-      const home = result.nodes.find((n) => n.id === 'screen:home') as NonNullable<
-        (typeof result.nodes)[number]
-      >;
+      const login = result.nodes.find((n) => n.id === 'screen:login') as PositionedNode;
+      const home = result.nodes.find((n) => n.id === 'screen:home') as PositionedNode;
       expect(login.y).toBeLessThan(home.y);
     });
 
     it('LR 方向でレイアウトを計算する → source が target より左に配置される', () => {
       const result = computeLayout(twoNodesOneEdge, { direction: 'LR' });
 
-      const login = result.nodes.find((n) => n.id === 'screen:login') as NonNullable<
-        (typeof result.nodes)[number]
-      >;
-      const home = result.nodes.find((n) => n.id === 'screen:home') as NonNullable<
-        (typeof result.nodes)[number]
-      >;
+      const login = result.nodes.find((n) => n.id === 'screen:login') as PositionedNode;
+      const home = result.nodes.find((n) => n.id === 'screen:home') as PositionedNode;
       expect(login.x).toBeLessThan(home.x);
     });
 
@@ -125,8 +115,20 @@ describe('グラフレイアウト計算', () => {
       it('ノード ID が重複する GraphData でレイアウトを計算する → エラーにならず最後のノード定義が使われる', () => {
         const dupeGraph: GraphData = {
           nodes: [
-            { id: 'screen:a', type: 'screen', label: 'A-old', sublabel: '/a', metadata: {} },
-            { id: 'screen:a', type: 'screen', label: 'A-new', sublabel: '/a', metadata: {} },
+            {
+              id: 'screen:a',
+              type: 'screen',
+              label: 'A-old',
+              sublabel: '/a',
+              metadata: {},
+            },
+            {
+              id: 'screen:a',
+              type: 'screen',
+              label: 'A-new',
+              sublabel: '/a',
+              metadata: {},
+            },
           ],
           edges: [],
         };
@@ -151,6 +153,20 @@ describe('グラフレイアウト計算', () => {
         for (const node of result.nodes) {
           expect(typeof node.x).toBe('number');
           expect(typeof node.y).toBe('number');
+        }
+      });
+
+      it('ノード同士が重ならないレイアウトを計算する → 全ノードの矩形が他のノードと重複しない', () => {
+        const result = computeLayout(createLargeGraph(10));
+
+        for (let i = 0; i < result.nodes.length; i++) {
+          for (let j = i + 1; j < result.nodes.length; j++) {
+            const a = result.nodes[i];
+            const b = result.nodes[j];
+            const overlapX = Math.abs(a.x - b.x) < (a.width + b.width) / 2;
+            const overlapY = Math.abs(a.y - b.y) < (a.height + b.height) / 2;
+            expect(overlapX && overlapY, `ノード ${a.id} と ${b.id} が重なっている`).toBe(false);
+          }
         }
       });
     });

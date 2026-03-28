@@ -168,16 +168,46 @@ function NodeComponent({
       />
       <text
         x={node.x}
-        y={node.y - 4}
+        y={node.y - 6}
         text-anchor="middle"
-        font-size={12}
+        font-size={13}
         font-weight={600}
         fill="#1F2937"
       >
-        {node.label.length > 16 ? `${node.label.slice(0, 15)}...` : node.label}
+        {node.label.length > 22 ? `${node.label.slice(0, 21)}...` : node.label}
       </text>
-      <text x={node.x} y={node.y + 14} text-anchor="middle" font-size={10} fill="#9CA3AF">
-        {node.sublabel.length > 20 ? `${node.sublabel.slice(0, 19)}...` : node.sublabel}
+      <text x={node.x} y={node.y + 14} text-anchor="middle" font-size={11} fill="#9CA3AF">
+        {node.sublabel.length > 26 ? `${node.sublabel.slice(0, 25)}...` : node.sublabel}
+      </text>
+    </g>
+  );
+}
+
+function EdgeLabel({ edge, style }: { edge: PositionedEdge; style: { stroke: string } }) {
+  if (!edge.label) return null;
+  const midIdx = Math.floor(edge.points.length / 2);
+  const midPoint = edge.points[midIdx];
+  const displayLabel = edge.label.length > 16 ? `${edge.label.slice(0, 15)}...` : edge.label;
+
+  return (
+    <g>
+      <rect
+        x={midPoint.x - 55}
+        y={midPoint.y - 18}
+        width={110}
+        height={16}
+        rx={3}
+        fill="white"
+        fill-opacity={0.9}
+      />
+      <text
+        x={midPoint.x}
+        y={midPoint.y - 6}
+        text-anchor="middle"
+        font-size={9}
+        fill={style.stroke}
+      >
+        {displayLabel}
       </text>
     </g>
   );
@@ -212,17 +242,7 @@ function EdgeComponent({ edge }: { edge: PositionedEdge }) {
         `}
         fill={style.stroke}
       />
-      {edge.label && (
-        <text
-          x={(edge.points[0].x + arrowPoint.x) / 2}
-          y={(edge.points[0].y + arrowPoint.y) / 2 - 8}
-          text-anchor="middle"
-          font-size={9}
-          fill={style.stroke}
-        >
-          {edge.label.length > 20 ? `${edge.label.slice(0, 19)}...` : edge.label}
-        </text>
-      )}
+      <EdgeLabel edge={edge} style={style} />
     </g>
   );
 }

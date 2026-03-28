@@ -77,9 +77,20 @@ function CoverageSummary({ data }: { data: SpecsData }) {
   );
 }
 
+function parsePath(): View {
+  const path = window.location.pathname.replace(/^\//, '');
+  if (!path) return { type: 'dashboard' };
+  const [type, ...idParts] = path.split('/');
+  const id = idParts.join('/');
+  if (id && ['screen', 'unit', 'setup', 'workflow'].includes(type)) {
+    return { type: type as View['type'], id } as View;
+  }
+  return { type: 'dashboard' };
+}
+
 function BrowserApp() {
   const [data, setData] = useState<SpecsData>((window as any).__TESPEC_DATA__);
-  const [view, setView] = useState<View>({ type: 'dashboard' });
+  const [view, setView] = useState<View>(parsePath);
 
   useEffect(() => {
     const es = new EventSource('/events');
@@ -92,8 +103,17 @@ function BrowserApp() {
     return () => es.close();
   }, []);
 
+  useEffect(() => {
+    const onPopState = () => setView(parsePath());
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
   function navigate(type: string, id: string) {
-    setView({ type: type as View['type'], id } as View);
+    const next = { type: type as View['type'], id } as View;
+    const url = next.type === 'dashboard' ? '/' : `/${next.type}/${(next as any).id}`;
+    window.history.pushState(null, '', url);
+    setView(next);
   }
 
   function getReferencingScreens(setupId: string) {
@@ -116,7 +136,10 @@ function BrowserApp() {
       <nav class="w-64 bg-white border-r p-4 space-y-4 shrink-0">
         {view.type !== 'dashboard' && (
           <button
-            onClick={() => setView({ type: 'dashboard' })}
+            onClick={() => {
+              window.history.pushState(null, '', '/');
+              setView({ type: 'dashboard' });
+            }}
             class="text-sm text-blue-600 hover:underline mb-2"
           >
             ← Dashboard
@@ -195,7 +218,7 @@ function BrowserApp() {
         )}
       </nav>
 
-      <main class="flex-1 p-6">
+      <main class="flex-1 p-6 overflow-hidden">
         {isEmpty && (
           <div data-testid="empty-state" class="text-gray-400 text-center py-12">
             No specs defined.
@@ -203,7 +226,7 @@ function BrowserApp() {
         )}
 
         {view.type === 'dashboard' && (
-          <div class="flex h-full gap-0">
+          <div class="flex h-[calc(100vh-3rem)] gap-0">
             <div class="flex-1 overflow-y-auto pr-4">
               <CoverageSummary data={data} />
 
@@ -374,7 +397,7 @@ function BrowserApp() {
               )}
             </div>
 
-            <div class="w-1/2 border-l border-gray-200 min-h-[400px]">
+            <div class="w-1/2 flex-shrink-0 border-l border-gray-200 overflow-hidden">
               <NodeGraph
                 data={{ screens: data.screens, setups: data.setups, workflows: data.workflows }}
                 onNodeClick={(type, id) => navigate(type, id)}

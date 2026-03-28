@@ -7,6 +7,7 @@ YAML で画面仕様を定義し、テストスケルトンを生成する CLI �
 ```bash
 pnpm test          # テスト実行
 pnpm build         # ビルド
+pnpm view          # ビルド + ビューアー起動（http://localhost:3737）
 pnpm lint          # lint
 pnpm check         # lint + format
 ```
