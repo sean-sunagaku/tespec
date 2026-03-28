@@ -7,6 +7,7 @@ YAML で画面仕様を定義し、テストスケルトンを生成する CLI �
 ```bash
 pnpm test          # テスト実行
 pnpm build         # ビルド
+pnpm view          # ビルド + ビューアー起動（http://localhost:3737）
 pnpm lint          # lint
 pnpm check         # lint + format
 ```
@@ -28,3 +29,11 @@ pnpm skill:install
 ### Skill の更新タイミング
 
 `src/core/schema.ts` を変更した場合は `pnpm skill:sync` でルールファイルを再生成すること。
+
+### Skill 編集時のルール
+
+Skill に追記・修正する際は、**`skills/` 配下のファイルを直接編集すること**。
+
+- 編集対象: `skills/tespec-yaml-gen/` （リポジトリ内、git 管理対象）
+- `pnpm skill:install` は使わない（`generate-references.ts` が手動編集を上書きするため）
+- `pnpm skill:sync` も同様に手動編集を上書きするため、使わない

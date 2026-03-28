@@ -1,0 +1,110 @@
+screen: viewer-node-graph
+route: /
+title: Viewer ノードグラフ
+cases:
+  - action: ダッシュボードでグラフを確認する
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - / にアクセスする
+    expect:
+      - ダッシュボードの右側にノードグラフが表示される
+      - Screen ノードが青系の角丸矩形で表示される
+      - Setup ノードが緑系の角丸矩形で表示される
+    type: normal
+
+  - action: navigates_to のエッジを確認する
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - / にアクセスする
+    expect:
+      - navigates_to を持つ case に対応する実線の青エッジが表示される
+      - エッジのラベルに case の action 名が表示される
+    type: normal
+
+  - action: Workflow のエッジを確認する
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - / にアクセスする
+    expect:
+      - Workflow の steps 間に破線の紫エッジが表示される
+      - エッジのラベルに workflow 名と step 番号が表示される
+    type: normal
+
+  - action: Setup 参照のエッジを確認する
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - / にアクセスする
+    expect:
+      - case.given で Setup を参照する Screen から点線の緑エッジが表示される
+    type: normal
+
+  - action: ノードにホバーする
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - / にアクセスする
+      - Screen ノードにマウスオーバーする
+    expect:
+      - ツールチップに title と route が表示される
+      - ツールチップに case 数が表示される
+    type: normal
+
+  - action: ノードをクリックする
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - / にアクセスする
+      - Screen ノードをクリックする
+    expect: クリックした Screen の詳細画面に遷移する
+    type: normal
+    navigates_to: viewer-screen-detail
+
+  - action: グラフをズームする
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - / にアクセスする
+      - グラフ上でマウスホイールを操作する
+    expect: グラフが拡大または縮小される
+    type: normal
+
+  - action: グラフをパンする
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - / にアクセスする
+      - グラフ上でドラッグする
+    expect: グラフ全体が移動する
+    type: normal
+
+  - action: YAML 変更でグラフが更新される
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - / にアクセスする
+      - Screen YAML に navigates_to を追加して保存する
+    expect: グラフに新しいエッジが自動的に追加される
+    type: normal
+
+  - action: specs が 0 件でグラフを表示する
+    given: viewer_running_empty
+    steps:
+      - "use:viewer_running_empty"
+      - / にアクセスする
+    expect: グラフ領域に空状態のメッセージが表示される
+    type: boundary
+
+  - action: navigates_to が存在しない screen を参照している
+    given: viewer_running
+    steps:
+      - "use:viewer_running"
+      - / にアクセスする
+    expect:
+      - 参照先が不明なエッジはグラフに表示されない
+    not_expect:
+      - グラフの描画がクラッシュする
+    type: error

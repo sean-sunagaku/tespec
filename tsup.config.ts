@@ -21,7 +21,7 @@ export default defineConfig([
     minify: true,
     sourcemap: false,
     external: [],
-    noExternal: ['preact'],
+    noExternal: ['preact', '@dagrejs/dagre'],
     jsxFactory: 'h',
     jsxFragment: 'Fragment',
     esbuildOptions(options) {

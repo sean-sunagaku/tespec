@@ -1,0 +1,10 @@
+workflow: viewer-graph-navigation
+title: グラフからの画面詳細遷移フロー
+steps:
+  - screen: viewer-node-graph
+    action: ダッシュボードでノードグラフを確認する
+    expect: Screen と Setup のノードがグラフに表示される
+  - screen: viewer-node-graph
+    action: Screen ノードをクリックする
+    expect: クリックした Screen の詳細画面に遷移する
+  - screen: viewer-screen-detail

@@ -1,0 +1,9 @@
+workflow: viewer-graph-realtime-update
+title: YAML 編集によるグラフリアルタイム更新フロー
+steps:
+  - screen: viewer-node-graph
+    action: ダッシュボードでノードグラフを確認する
+    expect: 現在の Screen 間の遷移エッジが表示される
+  - screen: viewer-node-graph
+    action: Screen YAML に navigates_to を追加して保存する
+    expect: グラフに新しいエッジが自動的に追加される

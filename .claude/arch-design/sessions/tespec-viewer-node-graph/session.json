@@ -1,0 +1,68 @@
+{
+  "sessionId": "tespec-viewer-node-graph",
+  "topic": "tespec view ノードグラフ可視化 — モジュール設計",
+  "status": "completed",
+  "mode": "standard",
+  "currentStep": 4,
+  "createdAt": "2026-03-28T00:00:00Z",
+  "updatedAt": "2026-03-28T00:00:00Z",
+  "techStack": {
+    "language": "TypeScript",
+    "framework": "Preact 10.29 + Hono",
+    "build": "tsup (esbuild)",
+    "style": "Tailwind CSS (CDN)",
+    "test": "vitest + @testing-library/preact",
+    "newDeps": ["@dagrejs/dagre", "d3-zoom", "d3-selection"]
+  },
+  "designPolicy": {
+    "nodeClickBehavior": "dashboard 3-column (nav + cards + graph), detail view 2-column unchanged",
+    "graphModuleLocation": "src/core/viewer/graph/ (viewer subdir, move to src/core/graph/ when CLI reuse needed)",
+    "architecture": "3-layer: transform → layout → rendering (NodeGraph.tsx inline)",
+    "layoutDirection": "dagre rankdir: TB (top-to-bottom)",
+    "dashboardLayout": "3-column: nav(w-64) + cards(flex-1) + graph(w-1/2)",
+    "specsInputType": "SpecsInput (schema.ts types only, no parser.ts dependency)",
+    "fileCount": "3 new files + 1 changed (transform.ts + layout.ts + NodeGraph.tsx + client-entry.tsx)"
+  },
+  "steps": {
+    "1_context": true,
+    "2_pattern": true,
+    "3_modules": true,
+    "4_output": true
+  },
+  "selectedPattern": "dagre + d3-zoom + Preact SVG (from design-discussion ADR)",
+  "modules": [
+    {
+      "file": "src/core/viewer/graph/transform.ts",
+      "status": "new",
+      "exports": ["SpecsInput", "specsToGraph"],
+      "dependencies": ["../schema.js"],
+      "testFile": "tests/viewer/graph-transform.test.ts"
+    },
+    {
+      "file": "src/core/viewer/graph/layout.ts",
+      "status": "new",
+      "exports": ["LayoutOptions", "computeLayout"],
+      "dependencies": ["./transform.js", "@dagrejs/dagre"],
+      "testFile": "tests/viewer/graph-layout.test.ts"
+    },
+    {
+      "file": "src/core/viewer/components/NodeGraph.tsx",
+      "status": "new",
+      "exports": ["NodeGraph"],
+      "dependencies": ["../graph/transform.js", "../graph/layout.js", "preact", "d3-zoom", "d3-selection"],
+      "inlineTypes": ["NodeType", "EdgeType", "GraphNode", "GraphEdge", "GraphData", "PositionedNode", "PositionedEdge", "LayoutResult"],
+      "testFile": "tests/viewer/node-graph.test.tsx"
+    },
+    {
+      "file": "src/core/viewer/client-entry.tsx",
+      "status": "change",
+      "change": "dashboard 3-column layout + NodeGraph integration"
+    }
+  ],
+  "rejectedOptions": {
+    "7filesCase": "Over-separation: GraphNode/Edge/Tooltip/types as separate files is YAGNI at this scale",
+    "1fileCase": "Sacrifices testability: transform and layout need independent unit tests",
+    "srcCoreGraph": "YAGNI: CLI reuse is hypothetical; move via git mv when actually needed",
+    "tabSwitchLayout": "Reduces core value: graph should always be visible as the primary visualization"
+  }
+}

@@ -50,37 +50,25 @@ steps:
   - ダッシュボードが表示されることを確認する
 ```
 
-## YAML 特殊文字の注意
-
-YAML の値に以下の文字・パターンが含まれると構文エラーになる。**クォートで囲むか、表現を変えて回避する。**
-
-| パターン | 問題 | 対処法 |
-|---------|------|--------|
-| `*` で始まる値 | YAML のアンカー参照と誤認 | `"*foo"` とクォート、または `foo パターン` と言い換え |
-| `"..."` を含む値 | クォートの入れ子で構文エラー | 内側のクォートを外す、または `'` で外側を囲む |
-| `//` を含む値 | YAML パーサーによっては問題 | クォートで囲むか、`コメント` と日本語で書く |
-| `#` を含む値 | YAML コメントと誤認 | `"値に#を含む"` とクォートで囲む |
-| `: ` を含む値 | YAML のキーと誤認 | `"キー: 値"` とクォートで囲む |
-| `[`, `]`, `{`, `}` | YAML のフロースタイルと誤認 | クォートで囲む |
-
-### 良い例と悪い例
-
+### Workflow
 ```yaml
-# BAD: * がアンカー参照と誤認される
-- action: *Tests.swift ファイルを収集する
-
-# GOOD: 表現を変える
-- action: Tests.swift パターンのファイルを収集する
-
-# BAD: 二重引用符の入れ子
-- action: "// TODO: implement" を検出する
-
-# GOOD: 表現を変える
-- action: TODO implement コメントを検出する
-
-# GOOD: シングルクォートで囲む
-- action: '"// TODO: implement" を検出する'
+workflow: user-registration
+title: 新規ユーザー登録フロー
+steps:
+  - screen: landing
+    action: 新規登録ボタンをクリックする
+    expect: 登録フォームが表示される
+  - screen: register
+    action: 必要事項を入力して送信する
+    expect: 確認メールの案内が表示される
+  - screen: dashboard
 ```
+
+### Workflow の書き方
+- 1 workflow = 1 パス。分岐がある場合は別 workflow に分ける
+- `steps[].screen` は screens/ に定義された screen ID を参照する
+- 最後の step は到達画面なので `action` / `expect` は省略可能
+- Screen の `navigates_to` が 1 遷移の定義なのに対し、Workflow は複数遷移の連鎖を定義する
 
 ## When to Validate
 - 単体の YAML を素早く確かめたいときは `tespec validate --file <path>` を使う。
