@@ -224,12 +224,108 @@ docs/tespec/
 
 screens_dir / units_dir / workflows_dir 配下のサブディレクトリは再帰的にスキャンされる。
 
+### テストディレクトリも同じ構成にする
+
+テストファイルは tespec YAML のディレクトリ構成をそのままミラーする（`/tespec-imp` 参照）:
+
+```text
+tests/
+├── screens/          ← docs/tespec/screens/ と同じ構造
+├── units/            ← docs/tespec/units/ と同じ構造
+├── workflows/        ← docs/tespec/workflows/ と同じ構造
+├── __mocks__/
+└── setup.ts
+```
+
+YAML を追加・移動したら、対応するテストファイルも同じ位置に追加・移動する。
+
 ## YAML 特殊文字に注意
 
 YAML の値に `*`, `"..."`, `//`, `#`, `: `, `[`, `]` が含まれると構文エラーになる。
 **クォートで囲むか、表現を日本語に変えて回避する。**
 
 詳細は `rules/writing-guide.md` の「YAML 特殊文字の注意」セクションを参照。
+
+---
+
+## YAML は Single Source of Truth
+
+テスト仕様の正本は常に YAML。テストコードは YAML の派生物。
+
+### 原則
+
+- **仕様変更は YAML から**: テストの `action` や `expect` を修正したくなったら、まず YAML を修正する
+- **YAML → テスト の一方向フロー**: テスト側で先に変更して YAML に戻す流れは禁止
+- **drift（乖離）はバグ**: YAML とテストの内容がズレている状態は仕様バグとして扱う
+
+### YAML 変更 → テスト同期フロー
+
+YAML を変更したら、テストのスケルトン構造をそれに合わせて同期する。
+テスト実装コード（`it()` の中身）は保持し、構造（`describe`/`it` のタイトル）だけを YAML に追従させる。
+
+```
+1. YAML を修正する（case 追加・削除・変更）
+   ↓
+2. tespec validate で warning 0 件を確認
+   ↓
+3. 既存テストとの diff を確認する（後述の手順）
+   ↓
+4. テストのスケルトン構造を YAML に合わせて修正する
+   - 追加された case → it() ブロックを追加（// TODO: implement）
+   - 削除された case → it() ブロックを削除
+   - 変更された action/expect → it() のタイトルを修正（中身は保持）
+   ↓
+5. テスト実行で確認
+```
+
+### YAML diff → テスト同期の手順
+
+YAML を変更した後、以下の手順で既存テストとの差分を特定する:
+
+**Step 1: YAML の変更内容を確認する**
+```bash
+git diff docs/tespec/
+```
+
+**Step 2: 対応するテストファイルを特定する**
+- screen YAML `screens/xxx.yaml` → `tests/screens/xxx.test.tsx`
+- unit YAML `units/xxx.yaml` → `tests/units/xxx.test.ts`
+- workflow YAML `workflows/xxx.yaml` → `tests/workflows/xxx.spec.ts`
+
+**Step 3: 差分の種類ごとに対応する**
+
+| YAML の変更 | テスト側の対応 |
+|------------|-------------|
+| case 追加 | `it("新しいaction → 新しいexpect", () => { // TODO: implement })` を追加 |
+| case 削除 | 対応する `it()` ブロックを削除 |
+| action 変更 | `it()` の第1引数（テスト名）を修正。中身はそのまま |
+| expect 変更 | `it()` のテスト名を修正。中身のアサーションもexpectに合わせて修正 |
+| type 変更 | `describe("異常系")` / `describe("境界値")` 間でブロックを移動 |
+| screen/unit 追加 | `tespec generate` で新スケルトン生成。既存ファイルには触れない |
+
+### いつ YAML を変更するか
+
+| 状況 | 対応 |
+|------|------|
+| 新しい操作・画面を追加したい | YAML に case/screen を追加 → テスト同期 |
+| テスト名(action)を修正したい | YAML の action を修正 → テストの it() タイトルを修正 |
+| expect を修正したい | YAML の expect を修正 → テストのアサーションを修正 |
+| 不要な case を削除したい | YAML から case を削除 → テストの it() を削除 |
+| テスト実装中に仕様の漏れに気づいた | **作業を止めて** YAML に case を追加 → validate → テスト同期 → 作業再開 |
+
+### CRITICAL: テスト実装中の仕様変更
+
+テスト（/tespec-imp Phase 2）や実装（Phase 4）の最中に仕様の修正が必要だと気づいた場合:
+
+1. **作業を一旦止める**
+2. YAML を修正する
+3. `tespec validate` で確認する
+4. 上記の「YAML diff → テスト同期の手順」でテストを同期する
+5. 元の作業に戻る
+
+「後で YAML に反映する」は忘れるのでやらない。**気づいた瞬間に YAML を直す。**
+
+---
 
 ## References
 
