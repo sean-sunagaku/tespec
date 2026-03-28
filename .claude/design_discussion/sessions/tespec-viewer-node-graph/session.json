@@ -1,0 +1,17 @@
+{
+  "sessionId": "tespec-viewer-node-graph",
+  "topic": "tespec view ノードグラフ可視化 + 将来編集機能のアーキテクチャ設計",
+  "status": "in_progress",
+  "mode": "standard",
+  "currentStep": 4,
+  "createdAt": "2026-03-27T00:00:00Z",
+  "updatedAt": "2026-03-27T00:00:00Z",
+  "steps": {
+    "1_clarification": true,
+    "2_proposals": true,
+    "3_comparison": true,
+    "4_decision": true
+  },
+  "proposals": [],
+  "selectedProposal": null
+}

@@ -50,6 +50,26 @@ steps:
   - ダッシュボードが表示されることを確認する
 ```
 
+### Workflow
+```yaml
+workflow: user-registration
+title: 新規ユーザー登録フロー
+steps:
+  - screen: landing
+    action: 新規登録ボタンをクリックする
+    expect: 登録フォームが表示される
+  - screen: register
+    action: 必要事項を入力して送信する
+    expect: 確認メールの案内が表示される
+  - screen: dashboard
+```
+
+### Workflow の書き方
+- 1 workflow = 1 パス。分岐がある場合は別 workflow に分ける
+- `steps[].screen` は screens/ に定義された screen ID を参照する
+- 最後の step は到達画面なので `action` / `expect` は省略可能
+- Screen の `navigates_to` が 1 遷移の定義なのに対し、Workflow は複数遷移の連鎖を定義する
+
 ## YAML 特殊文字の注意
 
 YAML の値に以下の文字・パターンが含まれると構文エラーになる。**クォートで囲むか、表現を変えて回避する。**

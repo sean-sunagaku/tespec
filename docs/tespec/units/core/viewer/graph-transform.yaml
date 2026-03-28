@@ -1,0 +1,56 @@
+unit: graph-transform
+title: グラフデータ変換
+methods:
+  - method: specsToGraph
+    cases:
+      - action: 空の SpecsInput を変換する
+        expect:
+          - nodes が空配列で返る
+          - edges が空配列で返る
+        type: boundary
+
+      - action: Screen のみの SpecsInput を変換する
+        expect:
+          - 各 Screen に対応する GraphNode が生成される
+          - GraphNode の type が screen である
+          - GraphNode の id が screen プレフィックス付きである
+          - edges が空配列で返る
+        type: normal
+
+      - action: Setup のみの SpecsInput を変換する
+        expect:
+          - 各 Setup に対応する GraphNode が生成される
+          - GraphNode の type が setup である
+        type: normal
+
+      - action: navigates_to を持つ case がある Screen を変換する
+        expect:
+          - navigates_to に対応する GraphEdge が生成される
+          - GraphEdge の type が navigates_to である
+          - GraphEdge の label に case の action が設定される
+        type: normal
+
+      - action: Workflow の steps を変換する
+        expect:
+          - 連続する steps 間に GraphEdge が生成される
+          - GraphEdge の type が workflow である
+          - GraphEdge の label に workflow 名と step 番号が設定される
+        type: normal
+
+      - action: case.given で setup を参照している Screen を変換する
+        expect:
+          - Screen から Setup への GraphEdge が生成される
+          - GraphEdge の type が given である
+        type: normal
+
+      - action: given が配列の場合に変換する
+        expect: 配列の各要素に対応する GraphEdge が生成される
+        type: normal
+
+      - action: 同一 source-target-type のエッジが複数ある場合
+        expect: 重複エッジのラベルが結合される
+        type: boundary
+
+      - action: navigates_to が存在しない screen ID を参照している場合
+        expect: 参照先が不明なエッジはスキップされる
+        type: error

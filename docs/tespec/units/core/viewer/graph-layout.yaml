@@ -1,0 +1,41 @@
+unit: graph-layout
+title: グラフレイアウト計算
+methods:
+  - method: computeLayout
+    cases:
+      - action: 空の GraphData でレイアウトを計算する
+        expect:
+          - nodes が空配列で返る
+          - edges が空配列で返る
+          - width と height が 0 である
+        type: boundary
+
+      - action: 1 ノードの GraphData でレイアウトを計算する
+        expect:
+          - ノードに x, y, width, height が割り当てられる
+        type: normal
+
+      - action: 2 ノード 1 エッジの GraphData でレイアウトを計算する
+        expect:
+          - TB 方向で source が target より上に配置される
+          - エッジに points 配列が設定される
+        type: normal
+
+      - action: デフォルトオプションでレイアウトを計算する
+        expect:
+          - direction が TB で計算される
+        type: normal
+
+      - action: LR 方向でレイアウトを計算する
+        expect:
+          - source が target より左に配置される
+        type: normal
+
+      - action: LayoutResult の width と height がグラフ全体を包含する
+        expect:
+          - 全ノードの座標が width と height の範囲内に収まる
+        type: normal
+
+      - action: 50 ノード規模の GraphData でレイアウトを計算する
+        expect: レイアウト計算が完了する
+        type: boundary

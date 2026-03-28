@@ -111,11 +111,13 @@ detail → dashboard    (戻るボタン)
 ## Step 5: YAML に落とす
 
 洗い出した操作を 1 つ = 1 case として YAML に書く。
+複数画面をまたぐシナリオは workflow YAML に書く。
 スキーマの詳細は以下を参照:
 
 - `rules/screen-schema.md` — screen YAML の必須フィールド
 - `rules/case-schema.md` — case の書き方（steps の具体性、navigates_to、操作の網羅性）
 - `rules/setup-schema.md` — setup の書き方
+- `rules/workflow-schema.md` — workflow YAML の書き方（複数画面 E2E シナリオ）
 - `rules/writing-guide.md` — 命名方針、`use:<setup_id>` の扱い
 
 ## Step 6: バリデーション
@@ -285,4 +287,5 @@ YAML の値に `*`, `"..."`, `//`, `#`, `: `, `[`, `]` が含まれると構文�
 - `rules/screen-schema.md`: screen YAML の例と field guide
 - `rules/case-schema.md`: case の例、操作と遷移の書き方、網羅性チェックリスト
 - `rules/setup-schema.md`: setup の例と field guide
+- `rules/workflow-schema.md`: workflow YAML の例と field guide（複数画面をまたぐ E2E シナリオ）
 - `rules/validation-rules.md`: validate コマンド、参照整合性、warning 条件
