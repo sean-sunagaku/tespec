@@ -114,6 +114,41 @@ Step 1〜4 が最も重要。Step 5〜6 は機械的な作業。
 
 **チェックリスト**: screen YAML の全 case をスキャンして、API 通信を伴う操作を抽出する。対応する API Route / サーバー関数の unit YAML がなければ追加する。
 
+##### 外部サービス呼び出しクライアント
+
+外部サービス（AI API、DB、外部 API）を呼び出すクライアントモジュールは、結合部分が壊れやすいため必ず unit YAML を作成する:
+
+- **呼び出しインターフェースが正しいか**: 引数・オプション・フラグの渡し方
+- **正常応答のパース**: レスポンスが期待する形式でデシリアライズされるか
+- **プロセス/接続の異常終了**: exit code 非ゼロ、接続切断
+- **プロセス/コマンドが見つからない**: ENOENT、PATH 未設定
+- **出力が期待する形式でない**: JSON でない、スキーマ不一致
+- **ストリーミング時の部分データ**: 非 JSON 行が混在、途中切断
+- **タイムアウト**: 長時間応答なし
+
+例: Claude Code SDK (`claude -p`) を呼ぶクライアントの場合
+
+```yaml
+unit: claude-client
+methods:
+  - method: callClaude
+    cases:
+      - action: プロンプトを渡して応答を取得する
+        expect: resultに応答テキストが含まれる
+        type: normal
+      - action: claude CLIが異常終了する場合
+        expect: エラーがスローされる
+        type: error
+      - action: claude CLIが見つからない場合
+        expect: spawn失敗のエラーがスローされる
+        type: error
+      - action: 出力がJSON形式でない場合
+        expect: パースエラーがスローされる
+        type: error
+```
+
+**外部サービスクライアントの unit テストはモックで高速に（CI 向け）、E2E テストは実呼び出しで確実に（ローカル向け）の 2 層で網羅する。**
+
 ### Step 3: 画面遷移を整理する
 
 操作の中から画面遷移を抜き出す。双方向遷移（行って戻る）も忘れない。
