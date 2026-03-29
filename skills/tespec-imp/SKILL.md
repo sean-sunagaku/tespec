@@ -158,6 +158,7 @@ import 可能なコンポーネントとして書く。
 - `references/api-testing.md` — Hono / Express 等のサーバー API テストパターン
 - `references/integration-testing.md` — ファイル監視・サーバーパイプラインの統合テストパターン
 - `references/spec-coverage.md` — YAML 仕様とテストファイルの整合性チェック（メタテスト）
+- `references/e2e-testing.md` — E2E テスト（モックなし・ローカル専用）の書き方、vitest 設定、タイムアウト設定
 
 ### テストヘルパーの作成
 
@@ -367,66 +368,45 @@ CI には入れない。ローカルでの動作確認・信頼性検証が目�
 
 ### なぜモックなし E2E が必要か
 
-モック化されたテストでは検出できない問題がある:
-- AI の応答が実際にパース可能なフォーマットで返るか
-- プロンプトが意図通りの応答を引き出すか
-- API Route が実際のサブプロセス呼び出しで正常に動くか
-- 結合部分のシリアライズ/デシリアライズが実データで壊れないか
+unit テストではモックで外部サービスの呼び出しを検証する。しかし **モックが正しくても実際の呼び出しが壊れている** ことがある。E2E はそこを確認する:
 
-### E2E テストの配置
+- **呼び出しインターフェースが本当に合っているか**: `spawn` の引数、CLI のフラグ、オプションの渡し方がモック通りに実サービスで動くか
+- **実際のレスポンス形式がパースできるか**: モックの返り値は想定通りだが、実サービスの出力フォーマットが変わっていないか
+- **プロンプトが意図通りの応答を引き出すか**: モックでは検証できない AI の実際の振る舞い
+- **結合部分が実データで壊れないか**: シリアライズ/デシリアライズが本物のデータで動くか
+
+つまり E2E は「unit テストのモックが嘘をついていないか」を実呼び出しで裏取りするテスト。
+
+外部サービスクライアントのモック unit テスト（`spawn` 引数の検証、エラーハンドリング等）は Phase 1〜5 の範囲。Phase 8 ではモックを一切使わない。
+
+### CRITICAL: E2E テストも GREEN まで確認する
+
+E2E テストは書いて終わりではない。**実際に実行して全パスするまでが Phase 8。**
 
 ```
-docs/tespec/e2e/           ← E2E 用 YAML（正本）
-tests/e2e/                 ← E2E テストコード
-  chat-flow.e2e.test.ts    ← Claude CLI 直接呼び出し
-  api-routes.e2e.test.ts   ← dev サーバー経由で API Route 呼び出し
+1. YAML を書く（docs/tespec/e2e/）
+   ↓
+2. テストコードを書く（tests/e2e/）
+   ↓
+3. 実行する（npm run test:e2e）
+   ↓
+4. 失敗したら原因を特定して修正する
+   ↓
+5. 全パスするまで 3〜4 を繰り返す
+   ↓
+6. GREEN を確認して Phase 8 完了
 ```
 
-ファイル名は `*.e2e.test.ts` パターン。通常テストと区別する。
+### E2E テストの典型的な失敗パターンと対処
 
-### vitest 設定
-
-```typescript
-// vitest.config.ts（CI 用）— E2E を除外
-test: {
-  exclude: ['tests/e2e/**', 'node_modules/**'],
-}
-
-// vitest.e2e.config.ts（ローカル専用）— E2E のみ
-test: {
-  include: ['tests/e2e/**/*.e2e.test.ts'],
-  testTimeout: 120000,  // AI 呼び出しは遅いので長めに
-}
-```
-
-```json
-// package.json
-{
-  "test": "vitest run",           // CI: E2E 除外
-  "test:e2e": "vitest run --config vitest.e2e.config.ts"  // ローカル専用
-}
-```
-
-### E2E テストの書き方
-
-**モックを一切使わない。** 実際のサービスを呼ぶ:
-
-```typescript
-// 直接 Claude CLI を呼ぶ
-import { callClaude } from "@/lib/ai/claude-client";
-
-it("画面設計の指示で JSON が返る", async () => {
-  const response = await callClaude("ログイン画面を設計して", systemPrompt);
-  const parsed = parseCanvasOutput(response.result);
-  expect(parsed.success).toBe(true);
-}, 60000);
-
-// dev サーバー経由で API Route を呼ぶ
-it("POST /api/chat が動く", async () => {
-  const res = await fetch("http://localhost:3000/api/chat", { ... });
-  expect(res.status).toBe(200);
-}, 60000);
-```
+| 失敗パターン | 原因 | 対処 |
+|------------|------|------|
+| タイムアウト | AI の応答が遅い / プロンプトが長すぎる | プロンプトを短くする + タイムアウトを伸ばす |
+| Connection refused | dev サーバーが起動していない | API Route テストの前に `npm run dev` を起動する |
+| 404 Not Found | Route が存在しない | ファイルパス・export 名を確認 |
+| JSON パースエラー | AI の応答形式が想定と違う | プロンプトをより明確にする |
+| AI が指示と違う形式で返す | プロンプトが曖昧 | systemPrompt で形式を明示する |
+| spawn ENOENT | `claude` CLI がインストールされていない | `claude --version` で確認 |
 
 ### E2E テストの実行条件
 
@@ -437,10 +417,7 @@ it("POST /api/chat が動く", async () => {
 | API キー | 不要（Claude Code SDK は OAuth 認証） |
 | CI 環境 | 実行しない |
 
-### YAML も書く
-
-E2E テストも YAML が正本。`docs/tespec/e2e/` に YAML を書いてからテストを実装する。
-ただし E2E 用 YAML は `config.yaml` の `units_dir` とは別管理でよい（validate 対象外でもよい）。
+具体的なコードの書き方、vitest 設定、プロンプトの書き方、タイムアウト設定は `references/e2e-testing.md` を参照。
 
 ---
 
