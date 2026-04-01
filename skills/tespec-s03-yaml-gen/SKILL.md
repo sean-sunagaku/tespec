@@ -1,17 +1,18 @@
 ---
-name: tespec-yaml-gen
+name: tespec-s03-yaml-gen
 description: >
-  画面遷移・ユーザー操作を対話で洗い出し、tespec YAML として定義するスキル。
+  tespec ワークフロー Step 3/4。画面遷移・ユーザー操作を対話で洗い出し、
+  tespec YAML として定義するスキル。
   「何の画面があって、各画面で何ができて、どこに遷移するか」を先に整理してから YAML に落とす。
   YAML をいきなり書かない。まず画面と操作を洗い出す。これが最も重要なステップ。
   Use when: 画面仕様を作りたい、画面の操作を洗い出したい、画面遷移を整理したい、
   tespec YAML を書きたい、テスト仕様を作りたい、機能から画面定義に落としたい。
   Triggers: "tespec YAML", "画面仕様", "画面の操作", "操作を洗い出す", "画面遷移",
-  "tespec-yaml-gen", "screen yaml", "case を書きたい", "画面定義", "テスト仕様",
+  "tespec-s03-yaml-gen", "screen yaml", "case を書きたい", "画面定義", "テスト仕様",
   "YAML 仕様", "テストケース定義"
 ---
 
-# tespec-yaml-gen — 画面遷移・操作の洗い出し → YAML 定義
+# tespec-s03-yaml-gen — 画面遷移・操作の洗い出し → YAML 定義
 
 ## 核心: YAML を書く前に、画面と操作を洗い出す
 
@@ -297,7 +298,7 @@ screens_dir / units_dir / workflows_dir 配下のサブディレクトリは再�
 
 ### テストディレクトリも同じ構成にする
 
-テストファイルは tespec YAML のディレクトリ構成をそのままミラーする（`/tespec-imp` 参照）:
+テストファイルは tespec YAML のディレクトリ構成をそのままミラーする（`tespec-s04-imp` 参照）:
 
 ```text
 tests/
@@ -386,7 +387,7 @@ git diff docs/tespec/
 
 ### CRITICAL: テスト実装中の仕様変更
 
-テスト（/tespec-imp Phase 2）や実装（Phase 4）の最中に仕様の修正が必要だと気づいた場合:
+テスト（tespec-s04-imp Phase 2）や実装（Phase 4）の最中に仕様の修正が必要だと気づいた場合:
 
 1. **作業を一旦止める**
 2. YAML を修正する

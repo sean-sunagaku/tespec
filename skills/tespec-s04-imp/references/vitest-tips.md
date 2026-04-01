@@ -1,6 +1,6 @@
 # vitest テスト実装の注意点
 
-tespec-imp で vitest テストを書く際のハマりポイントと対策。
+tespec-s04-imp で vitest テストを書く際のハマりポイントと対策。
 
 ## 環境設定
 
