@@ -1,17 +1,17 @@
 ---
-name: tespec-imp
+name: tespec-s04-imp
 description: >
-  tespec YAML 仕様からテスト駆動で実装するスキル。
+  tespec ワークフロー Step 4/4。tespec YAML 仕様からテスト駆動で実装するスキル。
   tespec generate で vitest テストスケルトンを生成し、テストの中身を実装してから
   本体コードを書く TDD ワークフロー。YAML → テスト → RED → 実装 → GREEN の流れを自動化する。
   Use when: tespec の YAML 仕様がある状態で実装を始めたい、TDD で実装したい、
   テストファーストで開発したい、YAML からテストを生成して実装したい。
-  Triggers: "tespec-imp", "TDD で実装", "テスト駆動で実装", "YAML からテスト生成して実装",
+  Triggers: "tespec-s04-imp", "TDD で実装", "テスト駆動で実装", "YAML からテスト生成して実装",
   "テストファースト", "test first", "RED GREEN", "spec から実装",
   "テスト書いてから実装", "generate してから実装", "仕様からTDD"
 ---
 
-# tespec-imp — tespec YAML 仕様からの TDD 実装
+# tespec-s04-imp — tespec YAML 仕様からの TDD 実装
 
 tespec YAML で定義された画面仕様・ユニット仕様から、テスト駆動開発（TDD）で実装するスキル。
 
@@ -188,7 +188,7 @@ import 可能なコンポーネントとして書く。
 - `describe` / `it` の順序
 - `describe` / `it` ブロックの追加・削除
 
-スケルトンの構造は YAML の定義そのもの。テスト実装中に「この `it` のタイトルを変えたい」「case を追加したい」と思ったら、**tespec-imp を止めて /tespec-yaml-gen で YAML を先に修正する**。YAML 修正 → テスト同期が終わってから tespec-imp に戻る。
+スケルトンの構造は YAML の定義そのもの。テスト実装中に「この `it` のタイトルを変えたい」「case を追加したい」と思ったら、**tespec-s04-imp を止めて tespec-s03-yaml-gen で YAML を先に修正する**。YAML 修正 → テスト同期が終わってから tespec-s04-imp に戻る。
 
 スケルトン構造を変更すると YAML との乖離が発生し、仕様とテストの対応関係が壊れる。YAML が single source of truth であるという原則を守るために、この制約は厳守する。
 
@@ -200,7 +200,7 @@ import 可能なコンポーネントとして書く。
     "PreToolUse": [
       {
         "matcher": "Edit|Write",
-        "command": "echo \"$TOOL_INPUT\" | jq -re '.file_path | test(\"tests/\")' > /dev/null 2>&1 && bash <path-to-tespec-imp>/scripts/check-skeleton-drift.sh || exit 0"
+        "command": "echo \"$TOOL_INPUT\" | jq -re '.file_path | test(\"tests/\")' > /dev/null 2>&1 && bash <path-to-tespec-s04-imp>/scripts/check-skeleton-drift.sh || exit 0"
       }
     ]
   }
@@ -299,7 +299,7 @@ GREEN 確認・リファクタ後に、実際にアプリを起動してブラ�
    ↓
 3. エラーが出たら原因を特定する
    ↓
-4. 不足している YAML 定義を追加する（/tespec-yaml-gen）
+4. 不足している YAML 定義を追加する（tespec-s03-yaml-gen）
    ↓
 5. テストを追加して RED 確認する
    ↓
@@ -339,7 +339,7 @@ dev サーバー起動後、以下を順に確認する:
 
 動作確認でエラーを見つけた場合、**直接コードを修正してはいけない**。
 
-1. まず `/tespec-yaml-gen` で YAML に case を追加する
+1. まず `tespec-s03-yaml-gen` で YAML に case を追加する
 2. `tespec validate` で確認する
 3. テストを追加する（RED 確認）
 4. **それから** 実装を修正する（GREEN 確認）
@@ -440,7 +440,7 @@ Phase 8 E2E:  2ファイル / 8テスト ローカルで全パス（実 Claude C
 ## コンテキスト判断
 
 ### tespec YAML が存在しない場合
-先に YAML を書く必要がある。`/tespec-yaml-gen` スキルを案内する。
+先に YAML を書く必要がある。`tespec-s03-yaml-gen` スキルを案内する。
 
 ### テストスケルトンが既に存在する場合
 Phase 2（テスト実装）から開始する。既存のスケルトンを読んで TODO の状態を確認する。
